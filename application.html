@@ -1,0 +1,1775 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+  <title>AI UI/UX Prompt Builder – Educational Edition v3.4 (Illustrator Fix)</title>
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/js/all.min.js"></script>
+  <style>
+    * {
+      margin: 0;
+      padding: 0;
+      box-sizing: border-box;
+    }
+    body {
+      font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+      background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+      padding: 20px;
+      min-height: 100vh;
+    }
+    .container {
+      max-width: 1400px;
+      margin: 0 auto;
+      background: white;
+      border-radius: 20px;
+      box-shadow: 0 20px 60px rgba(0,0,0,0.3);
+      overflow: hidden;
+    }
+    .header {
+      background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+      color: white;
+      padding: 40px;
+      text-align: center;
+      position: relative;
+    }
+    .header h1 {
+      font-size: 2.5em;
+      margin-bottom: 10px;
+    }
+    .header p {
+      font-size: 1.1em;
+      opacity: 0.9;
+    }
+    .version-badge {
+      position: absolute;
+      top: 20px;
+      right: 20px;
+      background: rgba(255,255,255,0.2);
+      padding: 8px 16px;
+      border-radius: 20px;
+      font-size: 0.9em;
+      backdrop-filter: blur(10px);
+    }
+    
+    /* --- TABS STYLING --- */
+    .tab-nav {
+      display: flex;
+      gap: 10px;
+      margin-bottom: 25px;
+      border-bottom: 2px solid #e2e8f0;
+      padding-bottom: 10px;
+      overflow-x: auto;
+    }
+    .tab-btn {
+      padding: 12px 20px;
+      background: #f8fafc;
+      border: 2px solid #e2e8f0;
+      border-radius: 10px;
+      cursor: pointer;
+      font-weight: 600;
+      color: #64748b;
+      white-space: nowrap;
+      transition: all 0.3s;
+      font-size: 1em;
+    }
+    .tab-btn:hover {
+      border-color: #667eea;
+      color: #667eea;
+      background: #f0f4ff;
+    }
+    .tab-btn.active {
+      background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+      color: white;
+      border-color: transparent;
+      box-shadow: 0 4px 10px rgba(102, 126, 234, 0.3);
+    }
+    .tab-pane {
+      display: none;
+      animation: fadeIn 0.4s ease;
+    }
+    .tab-pane.active {
+      display: block;
+    }
+    @keyframes fadeIn {
+      from { opacity: 0; transform: translateY(10px); }
+      to { opacity: 1; transform: translateY(0); }
+    }
+
+    /* --- LAYOUT STRUCTURE --- */
+    .content {
+      padding: 40px;
+      overflow-x: hidden;
+      max-width: 100%;
+    }
+    
+    .layout-wrapper {
+      display: flex;
+      gap: 30px;
+      align-items: flex-start;
+    }
+
+    .main-column {
+      flex: 1;
+      min-width: 0;
+    }
+
+    .side-column {
+      width: 300px;
+      flex-shrink: 0;
+      position: sticky;
+      top: 20px;
+      z-index: 100;
+    }
+
+    /* Quality Indicator Styling */
+    .quality-indicator {
+      background: white;
+      padding: 20px;
+      border-radius: 15px;
+      box-shadow: 0 10px 30px rgba(0,0,0,0.1);
+      border: 2px solid #e2e8f0;
+      transition: all 0.3s ease;
+    }
+    
+    .quality-indicator h3 {
+      color: #667eea;
+      margin-bottom: 15px;
+      display: flex;
+      align-items: center;
+      gap: 8px;
+      font-size: 1.1em;
+    }
+    .quality-score {
+      font-size: 3em;
+      font-weight: bold;
+      text-align: center;
+      margin: 10px 0;
+      background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+      -webkit-background-clip: text;
+      -webkit-text-fill-color: transparent;
+      background-clip: text;
+    }
+    .quality-breakdown {
+      font-size: 0.85em;
+      color: #64748b;
+      line-height: 1.8;
+    }
+    .quality-breakdown div {
+      display: flex;
+      justify-content: space-between;
+      padding: 5px 0;
+      border-bottom: 1px solid #f1f5f9;
+    }
+    .progress-bar {
+      width: 100%;
+      height: 8px;
+      background: #e2e8f0;
+      border-radius: 10px;
+      overflow: hidden;
+      margin: 15px 0;
+    }
+    .progress-fill {
+      height: 100%;
+      background: linear-gradient(90deg, #667eea 0%, #764ba2 100%);
+      transition: width 0.5s ease;
+      border-radius: 10px;
+    }
+
+    /* --- EXISTING STYLES --- */
+    .section {
+      background: #f8fafc;
+      padding: 25px;
+      margin-bottom: 25px;
+      border-radius: 15px;
+      border: 2px solid #e2e8f0;
+      position: relative;
+    }
+    .section.educational {
+      border-left: 5px solid #667eea;
+      background: linear-gradient(135deg, #f8fafc 0%, #e0e7ff 100%);
+    }
+    .section h2 {
+      color: #667eea;
+      margin-bottom: 20px;
+      font-size: 1.5em;
+      display: flex;
+      align-items: center;
+      gap: 10px;
+    }
+    .section h2::before {
+      content: "◆";
+      color: #764ba2;
+    }
+    .theory-badge {
+      display: inline-flex;
+      align-items: center;
+      gap: 5px;
+      background: #fef3c7;
+      color: #92400e;
+      padding: 4px 10px;
+      border-radius: 12px;
+      font-size: 0.75em;
+      font-weight: 600;
+      margin-left: 10px;
+      cursor: help;
+    }
+    .learn-more-box {
+      background: white;
+      border: 2px solid #667eea;
+      border-radius: 10px;
+      padding: 15px;
+      margin-top: 15px;
+      display: none;
+    }
+    .learn-more-box.active {
+      display: block;
+      animation: slideDown 0.3s ease;
+    }
+    @keyframes slideDown {
+      from { opacity: 0; transform: translateY(-10px); }
+      to { opacity: 1; transform: translateY(0); }
+    }
+    .learn-more-box h4 {
+      color: #667eea;
+      margin-bottom: 10px;
+      display: flex;
+      align-items: center;
+      gap: 8px;
+    }
+    .learn-more-box p {
+      color: #334155;
+      line-height: 1.6;
+      margin-bottom: 8px;
+    }
+    .reference {
+      font-size: 0.85em;
+      color: #64748b;
+      font-style: italic;
+      margin-top: 10px;
+      padding-top: 10px;
+      border-top: 1px solid #e2e8f0;
+    }
+    .grid {
+      display: grid;
+      grid-template-columns: repeat(auto-fit, minmax(300px, 1fr));
+      gap: 20px;
+    }
+    .form-group {
+      margin-bottom: 20px;
+      position: relative;
+    }
+    label {
+      display: flex;
+      align-items: center;
+      gap: 8px;
+      margin-bottom: 8px;
+      font-weight: 600;
+      color: #334155;
+    }
+    
+    .tooltip-icon {
+      display: inline-flex;
+      align-items: center;
+      justify-content: center;
+      width: 18px;
+      height: 18px;
+      background: #667eea;
+      color: white;
+      border-radius: 50%;
+      font-size: 12px;
+      cursor: help;
+      position: relative;
+      transition: transform 0.2s;
+    }
+    
+    .tooltip-icon:hover {
+        transform: scale(1.1);
+        z-index: 1000;
+    }
+
+    .tooltip-icon:hover::after {
+      content: attr(data-tooltip);
+      position: absolute;
+      left: 50%;
+      top: 25px;
+      transform: translateX(-50%);
+      background: rgba(30, 41, 59, 0.98);
+      color: #f1f5f9;
+      padding: 15px;
+      border-radius: 8px;
+      font-size: 13px;
+      font-weight: 400;
+      line-height: 1.5;
+      width: 220px;
+      white-space: normal;
+      text-align: left;
+      box-shadow: 0 10px 25px rgba(0,0,0,0.25);
+      border: 1px solid rgba(255,255,255,0.1);
+      backdrop-filter: blur(4px);
+      animation: tooltipFadeIn 0.3s ease-out;
+      pointer-events: none;
+    }
+
+    .tooltip-icon:hover::before {
+      content: "";
+      position: absolute;
+      left: 50%;
+      top: 15px;
+      transform: translateX(-50%);
+      border-left: 6px solid transparent;
+      border-right: 6px solid transparent;
+      border-bottom: 10px solid rgba(30, 41, 59, 0.98);
+      animation: tooltipFadeIn 0.3s ease-out;
+    }
+
+    .educational-tooltip {
+      background: #d97706 !important;
+      border: none !important;
+    }
+    
+    .educational-tooltip:hover::after {
+        background: #fffbeb;
+        color: #78350f;
+        border: 1px solid #fcd34d;
+        box-shadow: 0 10px 25px rgba(180, 83, 9, 0.15);
+    }
+    
+    .educational-tooltip:hover::before {
+        border-bottom-color: #fffbeb;
+    }
+
+    input[type="text"],
+    input[type="number"],
+    input[type="color"],
+    select,
+    textarea {
+      width: 100%;
+      padding: 12px;
+      border: 2px solid #cbd5e1;
+      border-radius: 8px;
+      font-size: 15px;
+      transition: all 0.3s;
+    }
+    input:focus, select:focus, textarea:focus {
+      outline: none;
+      border-color: #667eea;
+      box-shadow: 0 0 0 3px rgba(102, 126, 234, 0.1);
+    }
+    select[multiple] {
+      min-height: 120px;
+    }
+    .color-group {
+      display: grid;
+      grid-template-columns: repeat(auto-fit, minmax(150px, 1fr));
+      gap: 15px;
+    }
+    .color-input {
+      display: flex;
+      flex-direction: column;
+      gap: 8px;
+      position: relative;
+    }
+    .color-input input[type="color"] {
+      height: 50px;
+      cursor: pointer;
+    }
+    .contrast-indicator {
+      font-size: 0.85em;
+      padding: 5px 10px;
+      border-radius: 5px;
+      text-align: center;
+      margin-top: 5px;
+    }
+    .contrast-pass { background: #d1fae5; color: #065f46; }
+    .contrast-fail { background: #fee2e2; color: #991b1b; }
+    
+    .checkbox-grid {
+      display: grid;
+      grid-template-columns: repeat(auto-fill, minmax(280px, 1fr));
+      gap: 12px;
+      margin-top: 10px;
+    }
+    .checkbox-item {
+      display: flex;
+      align-items: flex-start;
+      gap: 8px;
+      padding: 12px;
+      background: white;
+      border-radius: 8px;
+      border: 2px solid #e2e8f0;
+      transition: all 0.3s;
+      position: relative;
+    }
+    .checkbox-item:hover {
+      border-color: #667eea;
+      background: #f8faff;
+    }
+    .checkbox-item input[type="checkbox"] {
+      width: 20px;
+      height: 20px;
+      cursor: pointer;
+      margin-top: 2px;
+    }
+    .checkbox-item .label-content { flex: 1; }
+    .checkbox-item label {
+      margin: 0;
+      cursor: pointer;
+      font-weight: 500;
+      display: block;
+    }
+    .principle-explanation {
+      font-size: 0.85em;
+      color: #64748b;
+      margin-top: 5px;
+      line-height: 1.4;
+    }
+    .learn-more-btn {
+      background: none;
+      border: none;
+      color: #667eea;
+      font-size: 0.8em;
+      cursor: pointer;
+      text-decoration: underline;
+      padding: 0;
+      margin-top: 5px;
+    }
+    .radio-group {
+      display: flex;
+      gap: 15px;
+      flex-wrap: wrap;
+    }
+    .radio-item {
+      display: flex;
+      align-items: center;
+      gap: 8px;
+      padding: 10px 20px;
+      background: white;
+      border: 2px solid #e2e8f0;
+      border-radius: 8px;
+      cursor: pointer;
+      transition: all 0.3s;
+    }
+    .radio-item:hover {
+      border-color: #667eea;
+      background: #f8faff;
+    }
+    .radio-item input[type="radio"] { cursor: pointer; }
+    
+    .btn-generate {
+      background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+      color: white;
+      border: none;
+      padding: 18px 40px;
+      font-size: 18px;
+      font-weight: bold;
+      border-radius: 12px;
+      cursor: pointer;
+      width: 100%;
+      margin-top: 30px;
+      transition: all 0.3s;
+      box-shadow: 0 4px 15px rgba(102, 126, 234, 0.4);
+    }
+    .btn-generate:hover {
+      transform: translateY(-2px);
+      box-shadow: 0 6px 20px rgba(102, 126, 234, 0.6);
+    }
+    .btn-generate:disabled {
+      opacity: 0.5;
+      cursor: not-allowed;
+      transform: none;
+    }
+    
+    .mode-switcher {
+      display: flex;
+      gap: 10px;
+      margin-bottom: 20px;
+      background: white;
+      padding: 5px;
+      border-radius: 10px;
+      border: 2px solid #e2e8f0;
+    }
+    .mode-btn {
+      flex: 1;
+      padding: 12px 20px;
+      border: none;
+      background: transparent;
+      color: #64748b;
+      font-weight: 600;
+      border-radius: 8px;
+      cursor: pointer;
+      transition: all 0.3s;
+    }
+    .mode-btn.active {
+      background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+      color: white;
+      box-shadow: 0 2px 10px rgba(102, 126, 234, 0.3);
+    }
+    
+    #promptOutput {
+      display: none;
+      margin-top: 30px;
+      padding: 30px;
+      background: #1e293b;
+      color: #f1f5f9;
+      border-radius: 12px;
+      font-family: 'Courier New', monospace;
+      font-size: 14px;
+      line-height: 1.8;
+      white-space: pre-wrap;
+      position: relative;
+    }
+    .btn-copy {
+      position: absolute;
+      top: 15px;
+      right: 15px;
+      background: #667eea;
+      color: white;
+      border: none;
+      padding: 10px 20px;
+      border-radius: 8px;
+      cursor: pointer;
+      font-weight: 600;
+      transition: all 0.3s;
+    }
+    .btn-copy:hover { background: #5568d3; }
+    
+    .comparison-mode {
+      display: none;
+      margin-top: 30px;
+      padding: 30px;
+      background: #f8fafc;
+      border-radius: 12px;
+      border: 2px solid #667eea;
+      overflow: hidden;
+      max-width: 100%;
+    }
+    .comparison-mode.active { display: block; }
+    .comparison-grid {
+      display: grid;
+      grid-template-columns: 1fr;
+      gap: 20px;
+      margin-top: 20px;
+    }
+    @media (min-width: 1200px) { .comparison-grid { grid-template-columns: 1fr 1fr; } }
+    .comparison-box {
+      background: white;
+      padding: 20px;
+      border-radius: 10px;
+      border: 2px solid #e2e8f0;
+      min-width: 0;
+      overflow: hidden;
+    }
+    .comparison-box h3 { color: #667eea; margin-bottom: 15px; font-size: 1.2em; }
+    .comparison-box pre {
+      background: #1e293b;
+      color: #f1f5f9;
+      padding: 15px;
+      border-radius: 8px;
+      font-size: 0.85em;
+      max-height: 500px;
+      overflow-y: auto;
+      white-space: pre-wrap;
+      word-wrap: break-word;
+      line-height: 1.6;
+    }
+    
+    .templates-grid {
+      display: grid;
+      grid-template-columns: repeat(auto-fill, minmax(280px, 1fr));
+      gap: 20px;
+      margin-top: 20px;
+    }
+    .template-card {
+      background: white;
+      border: 2px solid #e2e8f0;
+      border-radius: 12px;
+      padding: 20px;
+      cursor: pointer;
+      transition: all 0.3s;
+      position: relative;
+    }
+    .template-card:hover {
+      border-color: #667eea;
+      transform: translateY(-3px);
+      box-shadow: 0 6px 20px rgba(102, 126, 234, 0.2);
+    }
+    .template-card h3 { color: #667eea; margin-bottom: 10px; font-size: 1.2em; }
+    .template-card p { color: #64748b; font-size: 0.95em; line-height: 1.6; }
+    .template-tags { display: flex; flex-wrap: wrap; gap: 6px; margin-top: 12px; }
+    .template-tag {
+      background: #e0e7ff;
+      color: #4f46e5;
+      padding: 4px 10px;
+      border-radius: 12px;
+      font-size: 0.8em;
+      font-weight: 600;
+    }
+    
+    .footer {
+      background: #f8fafc;
+      border-top: 2px solid #e2e8f0;
+      padding: 30px;
+      text-align: center;
+      color: #64748b;
+    }
+    .footer p { margin: 8px 0; font-size: 0.95em; }
+    .footer strong { color: #334155; font-weight: 700; }
+    
+    /* SVG Generator Styles */
+    .svg-preview-section {
+        display: none;
+        margin-top: 30px;
+        padding: 30px;
+        background: white;
+        border-radius: 12px;
+        border: 2px solid #e2e8f0;
+        box-shadow: 0 10px 30px rgba(0,0,0,0.05);
+        position: relative;
+    }
+    .svg-preview-section.active { display: block; animation: slideDown 0.5s ease; }
+    .svg-header {
+        display: flex;
+        justify-content: space-between;
+        align-items: center;
+        margin-bottom: 20px;
+        padding-bottom: 15px;
+        border-bottom: 1px solid #e2e8f0;
+    }
+    .svg-header h2 { color: #667eea; font-size: 1.5em; display: flex; align-items: center; gap: 10px; }
+    .svg-canvas {
+        background-image: 
+            linear-gradient(45deg, #f0f0f0 25%, transparent 25%), 
+            linear-gradient(-45deg, #f0f0f0 25%, transparent 25%), 
+            linear-gradient(45deg, transparent 75%, #f0f0f0 75%), 
+            linear-gradient(-45deg, transparent 75%, #f0f0f0 75%);
+        background-size: 20px 20px;
+        background-position: 0 0, 0 10px, 10px -10px, -10px 0px;
+        border: 2px solid #cbd5e1;
+        border-radius: 8px;
+        min-height: 300px;
+        display: flex;
+        flex-direction: column;
+        align-items: center;
+        justify-content: center;
+        overflow: hidden;
+        margin-bottom: 20px;
+        padding: 20px;
+        position: relative;
+    }
+    .loading-spinner {
+        border: 5px solid #f3f3f3;
+        border-top: 5px solid #667eea;
+        border-radius: 50%;
+        width: 50px;
+        height: 50px;
+        animation: spin 1s linear infinite;
+    }
+    @keyframes spin { 0% { transform: rotate(0deg); } 100% { transform: rotate(360deg); } }
+    .api-key-input {
+        width: 100%;
+        padding: 10px;
+        border: 1px solid #cbd5e1;
+        border-radius: 6px;
+        margin-top: 10px;
+        font-size: 0.9em;
+        color: #64748b;
+    }
+    .settings-panel {
+        background: #f8fafc;
+        padding: 15px;
+        border-radius: 8px;
+        margin-top: 20px;
+        border: 1px solid #e2e8f0;
+    }
+    .btn-download {
+        background: #10b981;
+        color: white;
+        border: none;
+        padding: 12px 25px;
+        border-radius: 8px;
+        font-weight: 600;
+        cursor: pointer;
+        display: inline-flex;
+        align-items: center;
+        gap: 8px;
+        transition: all 0.3s;
+    }
+    .btn-download:hover { background: #059669; transform: translateY(-2px); }
+    .btn-download:disabled { background: #9ca3af; cursor: not-allowed; transform: none; }
+    .btn-ai-generate {
+        background: linear-gradient(135deg, #f59e0b 0%, #d97706 100%);
+        color: white;
+        border: none;
+        padding: 15px 30px;
+        font-size: 16px;
+        font-weight: bold;
+        border-radius: 10px;
+        cursor: pointer;
+        width: 100%;
+        margin-top: 10px;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        gap: 10px;
+        transition: all 0.3s;
+        box-shadow: 0 4px 12px rgba(245, 158, 11, 0.3);
+    }
+    .btn-ai-generate:hover { transform: translateY(-2px); box-shadow: 0 6px 18px rgba(245, 158, 11, 0.4); }
+    .ai-credit {
+        position: absolute;
+        bottom: 10px;
+        right: 10px;
+        font-size: 0.8em;
+        color: #64748b;
+        background: rgba(255,255,255,0.9);
+        padding: 4px 10px;
+        border-radius: 12px;
+        border: 1px solid #e2e8f0;
+    }
+
+    @media (max-width: 1100px) {
+        .layout-wrapper { flex-direction: column; }
+        .side-column { width: 100%; position: static; }
+        .quality-indicator { margin-bottom: 20px; }
+        .main-column { width: 100%; }
+        .tab-nav { flex-wrap: nowrap; overflow-x: auto; -webkit-overflow-scrolling: touch; }
+    }
+  </style>
+</head>
+<body>
+  <div class="container">
+    <div class="header">
+      <div class="version-badge">📚 Educational Edition v3.4 (Illustrator Fix)</div>
+      <h1>🎨 AI Prompt Builder for UI/UX</h1>
+      <p>Learning Prompt Creation through Design Theory and Practice</p>
+    </div>
+
+    <div class="content">
+      <div class="layout-wrapper">
+        
+        <div class="main-column">
+            
+            <div class="mode-switcher">
+                <button class="mode-btn active" onclick="switchMode('guided')" id="guidedBtn">
+                🎓 Guided Mode (Recommended for Learning)
+                </button>
+                <button class="mode-btn" onclick="switchMode('expert')" id="expertBtn">
+                ⚡ Expert Mode (Quick Access)
+                </button>
+            </div>
+
+            <div class="tab-nav">
+                <button class="tab-btn active" onclick="switchTab('tab1')" id="btn-tab1"><i class="fas fa-book-open"></i> Info & Templates</button>
+                <button class="tab-btn" onclick="switchTab('tab2')" id="btn-tab2"><i class="fas fa-layer-group"></i> Components & Styles</button>
+                <button class="tab-btn" onclick="switchTab('tab3')" id="btn-tab3"><i class="fas fa-brain"></i> Theory & Accessibility</button>
+                <button class="tab-btn" onclick="switchTab('tab4')" id="btn-tab4"><i class="fas fa-cogs"></i> Technical Parameters</button>
+            </div>
+
+            <div id="tab1" class="tab-pane active">
+                <div class="section educational">
+                    <h2>📖 About This Tool</h2>
+                    <p style="color: #334155; line-height: 1.8; margin-bottom: 15px;">
+                    This educational tool helps you learn how to translate <strong>design theory</strong> into 
+                    <strong>AI-understandable specifications</strong>. Each choice you make is grounded in established 
+                    UI/UX principles from Nielsen, Norman, and Gestalt psychology, ensuring you understand both 
+                    the <em>"what"</em> and the <em>"why"</em> of effective prompt construction.
+                    </p>
+                    <p style="color: #64748b; font-size: 0.95em; line-height: 1.6;">
+                    💡 <strong>Learning Tip:</strong> Hover over the <span style="display: inline-flex; align-items: center; justify-content: center; width: 16px; height: 16px; background: #667eea; color: white; border-radius: 50%; font-size: 10px;">ℹ️</span> 
+                    icons and 📚 theory badges to understand the design principles behind each option.
+                    </p>
+                </div>
+
+                <div class="section">
+                    <h2>🎯 Ready-Made Templates - Quick Start</h2>
+                    <p style="color: #64748b; margin-bottom: 15px;">
+                    Start with a pre-configured template to see how a professional prompt is structured:
+                    </p>
+                    <div class="templates-grid">
+                    <div class="template-card" onclick="applyTemplate('minimal')">
+                        <h3>🎯 Minimal App</h3>
+                        <p>Clean, minimalist design. Perfect for productivity tools and SaaS applications.</p>
+                        <div class="template-tags">
+                        <span class="template-tag">Flat Design</span>
+                        <span class="template-tag">Minimalist</span>
+                        <span class="template-tag">3 Colors</span>
+                        </div>
+                    </div>
+                    
+                    <div class="template-card" onclick="applyTemplate('dashboard')">
+                        <h3>📊 Professional Dashboard</h3>
+                        <p>Rich interface for dashboards with many UI components. Cards, tables, and charts.</p>
+                        <div class="template-tags">
+                        <span class="template-tag">Material Design</span>
+                        <span class="template-tag">Data-heavy</span>
+                        <span class="template-tag">Cards</span>
+                        </div>
+                    </div>
+                    
+                    <div class="template-card" onclick="applyTemplate('ecommerce')">
+                        <h3>🛍️ E-Commerce</h3>
+                        <p>Complete set for e-shops with product cards, shopping cart, and checkout forms.</p>
+                        <div class="template-tags">
+                        <span class="template-tag">Product Cards</span>
+                        <span class="template-tag">Buttons</span>
+                        <span class="template-tag">Forms</span>
+                        </div>
+                    </div>
+                    
+                    <div class="template-card" onclick="applyTemplate('modern')">
+                        <h3>✨ Modern Glassmorphism</h3>
+                        <p>Trendy glassmorphism with 3D effects. For apps that want to stand out!</p>
+                        <div class="template-tags">
+                        <span class="template-tag">Glassmorphism</span>
+                        <span class="template-tag">3D</span>
+                        <span class="template-tag">Premium</span>
+                        </div>
+                    </div>
+                    </div>
+                </div>
+            </div>
+
+            <div id="tab2" class="tab-pane">
+                <div class="section">
+                    <h2>Interface Components Selection</h2>
+                    <div class="form-group">
+                    <label for="componentList">
+                        Which components do you want to create?
+                        <span class="tooltip-icon" data-tooltip="Use standard interaction patterns. Hold Ctrl/Cmd to select multiple options.">ℹ️</span>
+                    </label>
+                    <select id="componentList" multiple onchange="updateQualityScore()">
+                        <optgroup label="Basic Elements">
+                        <option value="buttons">Buttons (Primary, Secondary, Tertiary)</option>
+                        <option value="input fields">Input Fields (Text, Email, Password)</option>
+                        <option value="forms">Forms (Sign up, Login, Contact)</option>
+                        <option value="checkboxes">Checkboxes & Radio Buttons</option>
+                        <option value="toggles">Toggle Switches</option>
+                        <option value="sliders">Sliders & Range Controls</option>
+                        </optgroup>
+                        <optgroup label="Navigation">
+                        <option value="navigation bar">Navigation Bar</option>
+                        <option value="sidebar">Sidebar Menu</option>
+                        <option value="tabs">Tabs & Segmented Controls</option>
+                        <option value="breadcrumbs">Breadcrumbs</option>
+                        <option value="pagination">Pagination</option>
+                        </optgroup>
+                        <optgroup label="Content">
+                        <option value="cards">Cards (Content, Product, Profile Cards)</option>
+                        <option value="lists">Lists (Simple, Detailed, Avatar Lists)</option>
+                        <option value="tables">Tables & Data Grids</option>
+                        <option value="avatars">Avatars & User Icons</option>
+                        </optgroup>
+                        <optgroup label="Feedback & Overlays">
+                        <option value="modals">Modal Dialogs</option>
+                        <option value="tooltips">Tooltips & Popovers</option>
+                        <option value="alerts">Alerts & Notifications</option>
+                        <option value="progress">Progress Bars & Loaders</option>
+                        <option value="badges">Badges & Labels</option>
+                        </optgroup>
+                        <optgroup label="Visual Elements">
+                        <option value="icons">Icon Set (Icons 24x24, 48x48)</option>
+                        <option value="illustrations">Illustrations & Empty States</option>
+                        <option value="background elements">Background Patterns & Shapes</option>
+                        <option value="dividers">Dividers & Separators</option>
+                        </optgroup>
+                    </select>
+                    <div class="hint">Select as many components as you need for your application</div>
+                    </div>
+                </div>
+
+                <div class="section">
+                    <h2>Design Style & Color Palette</h2>
+                    <div class="grid">
+                    <div class="form-group">
+                        <label for="style">
+                        Design Style
+                        <span class="tooltip-icon" data-tooltip="Aesthetic Consistency: The overall look and feel should remain consistent across all screens.">ℹ️</span>
+                        </label>
+                        <select id="style">
+                        <option value="flat">Flat Design</option>
+                        <option value="neumorphic">Neumorphic (Soft UI)</option>
+                        <option value="glassmorphism">Glassmorphism</option>
+                        <option value="material design">Material Design 3</option>
+                        <option value="apple human interface">Apple Human Interface</option>
+                        <option value="minimalist">Minimalist</option>
+                        <option value="3d">3D / Isometric</option>
+                        <option value="brutalism">Brutalism</option>
+                        </select>
+                    </div>
+                    <div class="form-group">
+                        <label for="complexity">
+                        Detail Level
+                        <span class="tooltip-icon" data-tooltip="Visual Noise: Balance complexity with clarity.">ℹ️</span>
+                        </label>
+                        <select id="complexity">
+                        <option value="simple">Simple (Basic shapes)</option>
+                        <option value="moderate">Moderate (Some details)</option>
+                        <option value="detailed">Detailed (Rich details)</option>
+                        </select>
+                    </div>
+                    </div>
+
+                    <div class="color-group">
+                    <div class="color-input">
+                        <label for="primaryColor">
+                        Primary Color
+                        <span class="tooltip-icon" data-tooltip="Brand Identity: The main color used for primary actions (CTAs).">ℹ️</span>
+                        </label>
+                        <input type="color" id="primaryColor" value="#667eea" onchange="checkColorContrast()">
+                        <div id="primaryContrast"></div>
+                    </div>
+                    <div class="color-input">
+                        <label for="secondaryColor">
+                        Secondary Color
+                        <span class="tooltip-icon" data-tooltip="Supporting Palette: Used for less important actions (Visual Hierarchy).">ℹ️</span>
+                        </label>
+                        <input type="color" id="secondaryColor" value="#764ba2" onchange="checkColorContrast()">
+                    </div>
+                    <div class="color-input">
+                        <label for="backgroundColor">
+                        Background Color
+                        <span class="tooltip-icon" data-tooltip="Canvas: High contrast with text is crucial for readability.">ℹ️</span>
+                        </label>
+                        <input type="color" id="backgroundColor" value="#ffffff" onchange="checkColorContrast()">
+                    </div>
+                    <div class="color-input">
+                        <label for="textColor">
+                        Text Color
+                        <span class="tooltip-icon" data-tooltip="Legibility: Must meet WCAG AA contrast ratio (4.5:1).">ℹ️</span>
+                        </label>
+                        <input type="color" id="textColor" value="#1f2937" onchange="checkColorContrast()">
+                        <div id="textContrast"></div>
+                    </div>
+                    <div class="color-input">
+                        <label for="accentColor">
+                        Accent/Error Color
+                        <span class="tooltip-icon" data-tooltip="Status & Feedback: Distinct colors for errors, success states, or urgent actions.">ℹ️</span>
+                        </label>
+                        <input type="color" id="accentColor" value="#ef4444">
+                    </div>
+                    </div>
+                </div>
+            </div>
+
+            <div id="tab3" class="tab-pane">
+                <div class="section educational">
+                    <h2>
+                    UI/UX Design Principles
+                    <span class="theory-badge" onclick="toggleLearnMore('nielsen')">📚 Nielsen's Heuristics</span>
+                    <span class="theory-badge" onclick="toggleLearnMore('norman')">📚 Norman's Principles</span>
+                    </h2>
+                    
+                    <div id="learnMoreNielsen" class="learn-more-box">
+                    <h4>📖 About Nielsen's Usability Heuristics</h4>
+                    <p>Jakob Nielsen's 10 usability heuristics are broad rules of thumb for user interface design.</p>
+                    <p class="reference">Reference: Nielsen, J. (1994). "Enhancing the explanatory power of usability heuristics."</p>
+                    </div>
+
+                    <div id="learnMoreNorman" class="learn-more-box">
+                    <h4>📖 About Norman's Design Principles</h4>
+                    <p>Don Norman's principles emphasize affordance, feedback, and visibility.</p>
+                    <p class="reference">Reference: Norman, D. A. (2013). "The Design of Everyday Things."</p>
+                    </div>
+
+                    <div class="checkbox-grid">
+                    <div class="checkbox-item">
+                        <input type="checkbox" id="consistency" checked onchange="updateQualityScore()">
+                        <div class="label-content">
+                        <label for="consistency">
+                            Consistency & Standards
+                            <span class="tooltip-icon educational-tooltip" data-tooltip="Nielsen #4: Users should not have to wonder whether different words, situations, or actions mean the same thing.">ℹ️</span>
+                        </label>
+                        <div class="principle-explanation">Similar elements should look and behave the same way.</div>
+                        <button class="learn-more-btn" onclick="showPrincipleDetail('consistency')">Learn more →</button>
+                        </div>
+                    </div>
+
+                    <div class="checkbox-item">
+                        <input type="checkbox" id="clarity" checked onchange="updateQualityScore()">
+                        <div class="label-content">
+                        <label for="clarity">
+                            Clarity & Visibility
+                            <span class="tooltip-icon educational-tooltip" data-tooltip="Norman: The system should always keep users informed about what is going on through appropriate feedback.">ℹ️</span>
+                        </label>
+                        <div class="principle-explanation">Users should immediately understand what they can do.</div>
+                        <button class="learn-more-btn" onclick="showPrincipleDetail('clarity')">Learn more →</button>
+                        </div>
+                    </div>
+
+                    <div class="checkbox-item">
+                        <input type="checkbox" id="feedback" checked onchange="updateQualityScore()">
+                        <div class="label-content">
+                        <label for="feedback">
+                            Immediate Feedback
+                            <span class="tooltip-icon educational-tooltip" data-tooltip="Norman: Every action must have an immediate and obvious reaction.">ℹ️</span>
+                        </label>
+                        <div class="principle-explanation">Every action should produce a visible response.</div>
+                        <button class="learn-more-btn" onclick="showPrincipleDetail('feedback')">Learn more →</button>
+                        </div>
+                    </div>
+
+                    <div class="checkbox-item">
+                        <input type="checkbox" id="recognition" onchange="updateQualityScore()">
+                        <div class="label-content">
+                        <label for="recognition">
+                            Recognition over Recall
+                            <span class="tooltip-icon educational-tooltip" data-tooltip="Nielsen #6: Minimize the user's memory load by making elements, actions, and options visible.">ℹ️</span>
+                        </label>
+                        <div class="principle-explanation">Show options instead of making users remember them.</div>
+                        <button class="learn-more-btn" onclick="showPrincipleDetail('recognition')">Learn more →</button>
+                        </div>
+                    </div>
+
+                    <div class="checkbox-item">
+                        <input type="checkbox" id="errorPrevention" onchange="updateQualityScore()">
+                        <div class="label-content">
+                        <label for="errorPrevention">
+                            Error Prevention
+                            <span class="tooltip-icon educational-tooltip" data-tooltip="Nielsen #5: Good error messages are important, but careful design which prevents a problem from occurring is even better.">ℹ️</span>
+                        </label>
+                        <div class="principle-explanation">Design to prevent user errors before they happen.</div>
+                        <button class="learn-more-btn" onclick="showPrincipleDetail('errorPrevention')">Learn more →</button>
+                        </div>
+                    </div>
+
+                    <div class="checkbox-item">
+                        <input type="checkbox" id="efficiency" onchange="updateQualityScore()">
+                        <div class="label-content">
+                        <label for="efficiency">
+                            Efficiency & Flexibility
+                            <span class="tooltip-icon educational-tooltip" data-tooltip="Nielsen #7: Accelerators may often speed up the interaction for the expert user.">ℹ️</span>
+                        </label>
+                        <div class="principle-explanation">Enable both novice and expert users to work quickly.</div>
+                        <button class="learn-more-btn" onclick="showPrincipleDetail('efficiency')">Learn more →</button>
+                        </div>
+                    </div>
+
+                    <div class="checkbox-item">
+                        <input type="checkbox" id="hierarchy" onchange="updateQualityScore()">
+                        <div class="label-content">
+                        <label for="hierarchy">
+                            Visual Hierarchy
+                            <span class="tooltip-icon educational-tooltip" data-tooltip="Organize content by importance using size, color, and position to guide the eye.">ℹ️</span>
+                        </label>
+                        <div class="principle-explanation">Guide attention to the most important elements first.</div>
+                        <button class="learn-more-btn" onclick="showPrincipleDetail('hierarchy')">Learn more →</button>
+                        </div>
+                    </div>
+
+                    <div class="checkbox-item">
+                        <input type="checkbox" id="affordance" onchange="updateQualityScore()">
+                        <div class="label-content">
+                        <label for="affordance">
+                            Affordance & Signifiers
+                            <span class="tooltip-icon educational-tooltip" data-tooltip="Norman: Design should signal how objects should be used.">ℹ️</span>
+                        </label>
+                        <div class="principle-explanation">Buttons should look pressable, inputs should look editable.</div>
+                        <button class="learn-more-btn" onclick="showPrincipleDetail('affordance')">Learn more →</button>
+                        </div>
+                    </div>
+                    </div>
+                </div>
+
+                <div class="section educational">
+                    <h2>
+                    Gestalt Perceptual Principles
+                    <span class="theory-badge" onclick="toggleLearnMore('gestalt')">📚 Gestalt Psychology</span>
+                    </h2>
+
+                    <div id="learnMoreGestalt" class="learn-more-box">
+                    <h4>📖 About Gestalt Principles</h4>
+                    <p>They describe how humans naturally perceive and organize visual elements.</p>
+                    <p class="reference">Reference: Wertheimer, M. (1923). "Laws of Organization in Perceptual Forms."</p>
+                    </div>
+
+                    <div class="checkbox-grid">
+                    <div class="checkbox-item">
+                        <input type="checkbox" id="proximity" onchange="updateQualityScore()">
+                        <div class="label-content">
+                        <label for="proximity">Proximity</label>
+                        <div class="principle-explanation">Group related elements by placing them close together.</div>
+                        </div>
+                    </div>
+                    <div class="checkbox-item">
+                        <input type="checkbox" id="similarity" onchange="updateQualityScore()">
+                        <div class="label-content">
+                        <label for="similarity">Similarity</label>
+                        <div class="principle-explanation">Use consistent styling for elements with similar functions.</div>
+                        </div>
+                    </div>
+                    <div class="checkbox-item">
+                        <input type="checkbox" id="closure" onchange="updateQualityScore()">
+                        <div class="label-content">
+                        <label for="closure">Closure</label>
+                        <div class="principle-explanation">Simplified shapes that users mentally complete.</div>
+                        </div>
+                    </div>
+                    <div class="checkbox-item">
+                        <input type="checkbox" id="figureGround" onchange="updateQualityScore()">
+                        <div class="label-content">
+                        <label for="figureGround">Figure/Ground</label>
+                        <div class="principle-explanation">Create clear distinction between content and background.</div>
+                        </div>
+                    </div>
+                    <div class="checkbox-item">
+                        <input type="checkbox" id="continuity" onchange="updateQualityScore()">
+                        <div class="label-content">
+                        <label for="continuity">Continuity</label>
+                        <div class="principle-explanation">Arrange elements to guide the user's eye naturally.</div>
+                        </div>
+                    </div>
+                    <div class="checkbox-item">
+                        <input type="checkbox" id="commonFate" onchange="updateQualityScore()">
+                        <div class="label-content">
+                        <label for="commonFate">Common Fate</label>
+                        <div class="principle-explanation">Synchronized movement indicates grouping.</div>
+                        </div>
+                    </div>
+                    </div>
+                </div>
+
+                <div class="section educational">
+                    <h2>
+                    Accessibility Standards
+                    <span class="badge">WCAG 2.1/2.2</span>
+                    </h2>
+
+                    <div class="checkbox-grid">
+                    <div class="checkbox-item">
+                        <input type="checkbox" id="a11y_contrast" checked onchange="updateQualityScore()">
+                        <div class="label-content">
+                        <label for="a11y_contrast">Color Contrast (WCAG AA)</label>
+                        <div class="principle-explanation">Minimum 4.5:1 for normal text.</div>
+                        </div>
+                    </div>
+                    <div class="checkbox-item">
+                        <input type="checkbox" id="a11y_focus" onchange="updateQualityScore()">
+                        <div class="label-content">
+                        <label for="a11y_focus">Focus Indicators</label>
+                        <div class="principle-explanation">Visible focus states for keyboard navigation.</div>
+                        </div>
+                    </div>
+                    <div class="checkbox-item">
+                        <input type="checkbox" id="a11y_touch" onchange="updateQualityScore()">
+                        <div class="label-content">
+                        <label for="a11y_touch">Touch Target Size</label>
+                        <div class="principle-explanation">Minimum 44x44px for touch targets.</div>
+                        </div>
+                    </div>
+                    <div class="checkbox-item">
+                        <input type="checkbox" id="a11y_labels" onchange="updateQualityScore()">
+                        <div class="label-content">
+                        <label for="a11y_labels">ARIA Labels & Semantics</label>
+                        <div class="principle-explanation">Semantic HTML and ARIA attributes for screen readers.</div>
+                        </div>
+                    </div>
+                    <div class="checkbox-item">
+                        <input type="checkbox" id="a11y_colorblind" onchange="updateQualityScore()">
+                        <div class="label-content">
+                        <label for="a11y_colorblind">Colorblind Friendly</label>
+                        <div class="principle-explanation">Don't rely on color alone to convey information.</div>
+                        </div>
+                    </div>
+                    <div class="checkbox-item">
+                        <input type="checkbox" id="a11y_text_size" onchange="updateQualityScore()">
+                        <div class="label-content">
+                        <label for="a11y_text_size">Readable Text Sizes</label>
+                        <div class="principle-explanation">Minimum 16px for body text, scalable typography.</div>
+                        </div>
+                    </div>
+                    </div>
+                </div>
+            </div>
+
+            <div id="tab4" class="tab-pane">
+                <div class="section">
+                    <h2>Technical Parameters & Export Options</h2>
+                    <div class="grid">
+                    <div class="form-group">
+                        <label for="variants">
+                        Number of Variants per Component
+                        <span class="tooltip-icon" data-tooltip="e.g. Primary, Secondary, Ghost, etc.">ℹ️</span>
+                        </label>
+                        <input type="number" id="variants" min="1" max="10" value="3">
+                        <div class="hint">e.g. 3 button types: Primary, Secondary, Ghost</div>
+                    </div>
+                    <div class="form-group">
+                        <label for="states">
+                        Interaction States
+                        <span class="tooltip-icon" data-tooltip="Define which interactive states must be visually designed.">ℹ️</span>
+                        </label>
+                        <select id="states" multiple size="4">
+                        <option value="default" selected>Default</option>
+                        <option value="hover" selected>Hover</option>
+                        <option value="active" selected>Active/Pressed</option>
+                        <option value="focus">Focus</option>
+                        <option value="disabled">Disabled</option>
+                        <option value="loading">Loading</option>
+                        </select>
+                    </div>
+                    </div>
+
+                    <div class="grid">
+                    <div class="form-group">
+                        <label for="borderRadius">
+                        Border Radius
+                        <span class="tooltip-icon" data-tooltip="Consistency in corner rounding contributes to the overall 'feel' of the brand.">ℹ️</span>
+                        </label>
+                        <input type="number" id="borderRadius" min="0" max="50" value="8">
+                    </div>
+                    <div class="form-group">
+                        <label for="spacing">
+                        Spacing System
+                        <span class="tooltip-icon" data-tooltip="A systematic approach to spacing ensures visual rhythm.">ℹ️</span>
+                        </label>
+                        <select id="spacing">
+                        <option value="4px">4px Base (4, 8, 12, 16...)</option>
+                        <option value="8px" selected>8px Base (8, 16, 24, 32...)</option>
+                        <option value="custom">Custom</option>
+                        </select>
+                    </div>
+                    </div>
+
+                    <div class="form-group">
+                    <label>
+                        SVG Export Type
+                        <span class="tooltip-icon" data-tooltip="Select the structural organization of the output file.">ℹ️</span>
+                    </label>
+                    <div class="radio-group">
+                        <div class="radio-item">
+                        <input type="radio" id="singleSVG" name="svgOutput" checked>
+                        <label for="singleSVG">Single unified SVG file</label>
+                        </div>
+                        <div class="radio-item">
+                        <input type="radio" id="separateSVG" name="svgOutput">
+                        <label for="separateSVG">Separate SVG per component</label>
+                        </div>
+                        <div class="radio-item">
+                        <input type="radio" id="componentLibrary" name="svgOutput">
+                        <label for="componentLibrary">Component Library structure</label>
+                        </div>
+                    </div>
+                    </div>
+
+                    <div class="form-group">
+                    <label for="additionalNotes">
+                        Additional Instructions (Optional)
+                        <span class="tooltip-icon" data-tooltip="Any specific brand guidelines, animation requests, etc.">ℹ️</span>
+                    </label>
+                    <textarea id="additionalNotes" rows="3" placeholder="e.g. I want shadows, animations, specific transition effects..."></textarea>
+                    </div>
+                </div>
+            </div>
+
+            <button class="btn-generate" id="generateBtn" onclick="generatePrompt()">
+                🚀 Generate Educational Prompt
+            </button>
+
+            <div style="margin-top: 20px; text-align: center;">
+                <button class="btn-generate" style="background: linear-gradient(135deg, #10b981 0%, #059669 100%); width: auto; padding: 12px 30px;" onclick="toggleComparisonMode()">
+                📊 Compare: Basic vs Enhanced Prompt
+                </button>
+            </div>
+
+            <div class="comparison-mode" id="comparisonMode">
+                <h2 style="color: #667eea; margin-bottom: 20px;">📊 Prompt Comparison: Understanding the Difference</h2>
+                <div class="comparison-grid">
+                <div class="comparison-box">
+                    <h3>❌ Basic Prompt</h3>
+                    <pre id="basicPrompt"></pre>
+                </div>
+                <div class="comparison-box">
+                    <h3>✅ Enhanced Prompt (Theory-Grounded)</h3>
+                    <pre id="enhancedPrompt"></pre>
+                </div>
+                </div>
+            </div>
+
+            <div id="promptOutput">
+                <button class="btn-copy" onclick="copyPrompt()">📋 Copy Prompt</button>
+                <div id="promptText"></div>
+            </div>
+
+            <div class="svg-preview-section" id="svgPreviewSection">
+                <div class="svg-header">
+                    <h2>🤖 AI UI Preview & SVG Generator</h2>
+                    <div style="display:flex; gap:10px;">
+                        <button class="btn-download" id="downloadSvgBtn" disabled onclick="downloadSVG()">
+                            <i class="fas fa-download"></i> Download SVG
+                        </button>
+                    </div>
+                </div>
+                <p style="color: #64748b; margin-bottom: 15px;">Use AI to immediately generate a visual preview of your prompt.</p>
+                
+                <div class="svg-canvas" id="svgCanvas">
+                    <div style="text-align: center; color: #94a3b8;">
+                        <i class="fas fa-paint-brush" style="font-size: 48px; margin-bottom: 10px;"></i>
+                        <p>The preview will appear here</p>
+                    </div>
+                    <div class="ai-credit" id="aiCredit" style="display:none;">✨ Generated by Gemini AI</div>
+                </div>
+
+                <div class="settings-panel">
+                    <p style="font-size: 0.9em; color: #334155; margin-bottom: 8px;"><strong>For Local Files Only:</strong></p>
+                    <input type="password" id="apiKeyInput" class="api-key-input" placeholder="Optional: Paste your Gemini API Key here ONLY if running locally...">
+                </div>
+
+                <button class="btn-ai-generate" id="generateSvgBtn" onclick="generateSVG()">
+                    ✨ Generate Preview with AI
+                </button>
+            </div>
+
+        </div> <div class="side-column">
+             <div class="quality-indicator">
+                <h3>📊 Prompt Quality</h3>
+                <div class="quality-score" id="qualityScore">0</div>
+                <div class="progress-bar">
+                <div class="progress-fill" id="qualityProgress" style="width: 0%"></div>
+                </div>
+                <div class="quality-breakdown" id="qualityBreakdown">
+                <div><span>Components:</span><span id="scoreComponents">0/20</span></div>
+                <div><span>UI/UX Principles:</span><span id="scorePrinciples">0/25</span></div>
+                <div><span>Accessibility:</span><span id="scoreAccessibility">0/30</span></div>
+                <div><span>Gestalt Principles:</span><span id="scoreGestalt">0/15</span></div>
+                <div><span>Color Contrast:</span><span id="scoreContrast">0/10</span></div>
+                </div>
+            </div>
+        </div>
+
+      </div>
+    </div>
+
+    <div class="footer">
+      <div class="footer-card">
+        <h4>Georgios Korakakis</h4>
+        <p>Assistant Professor</p>
+        <p>Department of Graphic Design and Visual Communication</p>
+        <p>School of Applied Arts and Culture</p>
+        <p><strong>Uniwa (University of West Attica)</strong></p>
+      </div>
+      <p style="margin-top:20px; opacity:0.8;">Developed with the assistance of <strong>Gemini</strong> & <strong>Claude</strong> AI.</p>
+    </div>
+  </div>
+
+  <script>
+    // Tab Switching Logic
+    function switchTab(tabId) {
+        document.querySelectorAll('.tab-pane').forEach(el => el.classList.remove('active'));
+        document.querySelectorAll('.tab-btn').forEach(el => el.classList.remove('active'));
+        document.getElementById(tabId).classList.add('active');
+        document.getElementById('btn-' + tabId).classList.add('active');
+    }
+
+    // Educational Content Database
+    const educationalContent = {
+      consistency: { theory: "Nielsen's 4th Heuristic", explanation: "Users should not have to wonder whether different words, situations, or actions mean the same thing.", example: "All primary buttons should use the same color and size.", reference: "Nielsen, J. (1994)." },
+      clarity: { theory: "Norman's Visibility Principle", explanation: "The system should always keep users informed about what is going on, through appropriate feedback.", example: "Show loading states and confirmation messages.", reference: "Norman, D. A. (2013)." },
+      feedback: { theory: "Norman's Feedback Principle", explanation: "Every action should produce an immediate and obvious response.", example: "Buttons change appearance on hover, forms validate in real-time.", reference: "Norman, D. A. (2013)." },
+      recognition: { theory: "Nielsen's 6th Heuristic", explanation: "Minimize the user's memory load by making options visible.", example: "Use icons with labels, show recently used items.", reference: "Nielsen, J. (1994)." },
+      errorPrevention: { theory: "Nielsen's 5th Heuristic", explanation: "Even better than a good error message is a design that prevents a problem from occurring.", example: "Disable the 'Submit' button until fields are filled.", reference: "Nielsen, J. (1994)." },
+      efficiency: { theory: "Nielsen's 7th Heuristic", explanation: "Accelerators may often speed up the interaction for the expert user.", example: "Keyboard shortcuts, auto-complete features.", reference: "Nielsen, J. (1994)." },
+      hierarchy: { theory: "Gestalt Visual Hierarchy", explanation: "Organize content by importance using size, color, and position to guide the eye.", example: "Primary CTAs are larger and more prominent.", reference: "Wertheimer, M. (1923)." },
+      affordance: { theory: "Norman's Affordance Principle", explanation: "Design should signal how objects can be used.", example: "Buttons should look pressable.", reference: "Norman, D. A. (2013)." }
+    };
+
+    const templates = {
+      minimal: { components: ['buttons', 'input fields', 'cards', 'icons'], style: 'minimalist', complexity: 'simple', primaryColor: '#1f2937', secondaryColor: '#6b7280', backgroundColor: '#ffffff', textColor: '#111827', accentColor: '#3b82f6', variants: 2, borderRadius: 4, principles: ['consistency', 'clarity', 'feedback'], gestalt: ['proximity', 'similarity'], a11y: ['a11y_contrast', 'a11y_focus'] },
+      dashboard: { components: ['cards', 'tables', 'navigation bar', 'buttons', 'input fields', 'progress', 'badges'], style: 'material design', complexity: 'moderate', primaryColor: '#3b82f6', secondaryColor: '#8b5cf6', backgroundColor: '#f8fafc', textColor: '#1e293b', accentColor: '#ef4444', variants: 3, borderRadius: 8, principles: ['consistency', 'clarity', 'hierarchy', 'efficiency'], gestalt: ['proximity', 'similarity', 'figureGround'], a11y: ['a11y_contrast', 'a11y_focus', 'a11y_labels'] },
+      ecommerce: { components: ['cards', 'buttons', 'forms', 'badges', 'navigation bar', 'modals', 'progress'], style: 'flat', complexity: 'detailed', primaryColor: '#10b981', secondaryColor: '#f59e0b', backgroundColor: '#ffffff', textColor: '#111827', accentColor: '#ef4444', variants: 4, borderRadius: 12, principles: ['consistency', 'clarity', 'feedback', 'errorPrevention', 'affordance'], gestalt: ['proximity', 'similarity', 'closure', 'figureGround'], a11y: ['a11y_contrast', 'a11y_focus', 'a11y_touch', 'a11y_labels'] },
+      modern: { components: ['buttons', 'cards', 'navigation bar', 'modals', 'input fields', 'background elements'], style: 'glassmorphism', complexity: 'detailed', primaryColor: '#667eea', secondaryColor: '#764ba2', backgroundColor: '#f8fafc', textColor: '#1e293b', accentColor: '#ec4899', variants: 3, borderRadius: 16, principles: ['consistency', 'clarity', 'feedback', 'hierarchy', 'affordance'], gestalt: ['proximity', 'figureGround', 'continuity'], a11y: ['a11y_contrast', 'a11y_focus', 'a11y_colorblind'] }
+    };
+
+    let currentMode = 'guided';
+    let qualityScoreData = { components: 0, principles: 0, accessibility: 0, gestalt: 0, contrast: 0 };
+
+    function switchMode(mode) {
+      currentMode = mode;
+      document.getElementById('guidedBtn').classList.toggle('active', mode === 'guided');
+      document.getElementById('expertBtn').classList.toggle('active', mode === 'expert');
+      const educationalElements = document.querySelectorAll('.educational');
+      educationalElements.forEach(el => { el.style.display = mode === 'guided' ? 'block' : 'none'; });
+    }
+
+    function applyTemplate(templateName) {
+      const template = templates[templateName];
+      if (!template) return;
+      document.getElementById('componentList').selectedIndex = -1;
+      const componentList = document.getElementById('componentList');
+      for (let option of componentList.options) {
+        if (template.components.includes(option.value)) option.selected = true;
+      }
+      document.getElementById('style').value = template.style;
+      document.getElementById('complexity').value = template.complexity;
+      document.getElementById('primaryColor').value = template.primaryColor;
+      document.getElementById('secondaryColor').value = template.secondaryColor;
+      document.getElementById('backgroundColor').value = template.backgroundColor;
+      document.getElementById('textColor').value = template.textColor;
+      document.getElementById('accentColor').value = template.accentColor;
+      document.getElementById('variants').value = template.variants;
+      document.getElementById('borderRadius').value = template.borderRadius;
+
+      ['consistency', 'clarity', 'feedback', 'recognition', 'errorPrevention', 'efficiency', 'hierarchy', 'affordance'].forEach(id => {
+        document.getElementById(id).checked = template.principles.includes(id);
+      });
+      ['proximity', 'similarity', 'closure', 'figureGround', 'continuity', 'commonFate'].forEach(id => {
+        const element = document.getElementById(id);
+        if (element) element.checked = template.gestalt.includes(id);
+      });
+      ['a11y_contrast', 'a11y_focus', 'a11y_touch', 'a11y_labels', 'a11y_colorblind', 'a11y_text_size'].forEach(id => {
+        document.getElementById(id).checked = template.a11y.includes(id);
+      });
+
+      updateQualityScore();
+      checkColorContrast();
+      alert(`✅ The template was applied successfully! You can browse the Tabs to view the settings.`);
+      switchTab('tab2');
+    }
+
+    function toggleLearnMore(topic) {
+      const boxId = 'learnMore' + topic.charAt(0).toUpperCase() + topic.slice(1);
+      const box = document.getElementById(boxId);
+      box.classList.toggle('active');
+    }
+
+    function showPrincipleDetail(principle) {
+      const content = educationalContent[principle];
+      if (!content) return;
+      alert(`📚 ${content.theory}\n\n${content.explanation}\n\nExample: ${content.example}\n\nReference: ${content.reference}`);
+    }
+
+    function getLuminance(hex) {
+      const rgb = parseInt(hex.slice(1), 16);
+      const r = (rgb >> 16) & 0xff, g = (rgb >> 8) & 0xff, b = (rgb >> 0) & 0xff;
+      const [rs, gs, bs] = [r, g, b].map(c => {
+        c = c / 255;
+        return c <= 0.03928 ? c / 12.92 : Math.pow((c + 0.055) / 1.055, 2.4);
+      });
+      return 0.2126 * rs + 0.7152 * gs + 0.0722 * bs;
+    }
+
+    function getContrastRatio(hex1, hex2) {
+      const lum1 = getLuminance(hex1), lum2 = getLuminance(hex2);
+      const lighter = Math.max(lum1, lum2), darker = Math.min(lum1, lum2);
+      return (lighter + 0.05) / (darker + 0.05);
+    }
+
+    function checkColorContrast() {
+      const primaryColor = document.getElementById('primaryColor').value;
+      const backgroundColor = document.getElementById('backgroundColor').value;
+      const textColor = document.getElementById('textColor').value;
+      
+      const primaryRatio = getContrastRatio(primaryColor, backgroundColor);
+      const primaryEl = document.getElementById('primaryContrast');
+      if (primaryEl) {
+        if (primaryRatio >= 4.5) { primaryEl.className = 'contrast-indicator contrast-pass'; primaryEl.textContent = `✓ WCAG AA Pass (${primaryRatio.toFixed(2)}:1)`; qualityScoreData.contrast = 10; }
+        else if (primaryRatio >= 3.0) { primaryEl.className = 'contrast-indicator contrast-fail'; primaryEl.textContent = `⚠ Large Text Only (${primaryRatio.toFixed(2)}:1)`; qualityScoreData.contrast = 5; }
+        else { primaryEl.className = 'contrast-indicator contrast-fail'; primaryEl.textContent = `✗ WCAG Fail (${primaryRatio.toFixed(2)}:1)`; qualityScoreData.contrast = 0; }
+      }
+
+      const textRatio = getContrastRatio(textColor, backgroundColor);
+      const textEl = document.getElementById('textContrast');
+      if (textEl) {
+        if (textRatio >= 4.5) { textEl.className = 'contrast-indicator contrast-pass'; textEl.textContent = `✓ WCAG AA Pass (${textRatio.toFixed(2)}:1)`; }
+        else { textEl.className = 'contrast-indicator contrast-fail'; textEl.textContent = `✗ WCAG Fail (${textRatio.toFixed(2)}:1)`; qualityScoreData.contrast = 0; }
+      }
+      updateQualityScore();
+    }
+
+    function updateQualityScore() {
+      const components = getSelectedOptions(document.getElementById("componentList"));
+      qualityScoreData.components = components.length > 0 ? 20 : 0;
+
+      const principles = ['consistency', 'clarity', 'feedback', 'recognition', 'errorPrevention', 'efficiency', 'hierarchy', 'affordance'];
+      const selectedPrinciples = principles.filter(p => document.getElementById(p)?.checked).length;
+      qualityScoreData.principles = Math.round((selectedPrinciples / principles.length) * 25);
+
+      const a11y = ['a11y_contrast', 'a11y_focus', 'a11y_touch', 'a11y_labels', 'a11y_colorblind', 'a11y_text_size'];
+      const selectedA11y = a11y.filter(a => document.getElementById(a)?.checked).length;
+      qualityScoreData.accessibility = Math.round((selectedA11y / a11y.length) * 30);
+
+      const gestalt = ['proximity', 'similarity', 'closure', 'figureGround', 'continuity', 'commonFate'];
+      const selectedGestalt = gestalt.filter(g => document.getElementById(g)?.checked).length;
+      qualityScoreData.gestalt = Math.round((selectedGestalt / gestalt.length) * 15);
+
+      const totalScore = qualityScoreData.components + qualityScoreData.principles + qualityScoreData.accessibility + qualityScoreData.gestalt + qualityScoreData.contrast;
+
+      document.getElementById('qualityScore').textContent = totalScore;
+      document.getElementById('qualityProgress').style.width = totalScore + '%';
+      document.getElementById('scoreComponents').textContent = `${qualityScoreData.components}/20`;
+      document.getElementById('scorePrinciples').textContent = `${qualityScoreData.principles}/25`;
+      document.getElementById('scoreAccessibility').textContent = `${qualityScoreData.accessibility}/30`;
+      document.getElementById('scoreGestalt').textContent = `${qualityScoreData.gestalt}/15`;
+      document.getElementById('scoreContrast').textContent = `${qualityScoreData.contrast}/10`;
+    }
+
+    function getSelectedOptions(select) { return Array.from(select.selectedOptions).map(opt => opt.value); }
+    function getSelectedText(select) { return Array.from(select.selectedOptions).map(opt => opt.text); }
+
+    function generatePrompt() {
+      const components = getSelectedText(document.getElementById("componentList"));
+      if (components.length === 0) {
+        alert("⚠️ Please select at least one UI component!");
+        switchTab('tab2');
+        return;
+      }
+      const states = getSelectedText(document.getElementById("states"));
+      if (states.length === 0) {
+        alert("⚠️ Please select at least one interaction state!");
+        return;
+      }
+
+      const style = document.getElementById("style").selectedOptions[0].text;
+      const complexity = document.getElementById("complexity").selectedOptions[0].text;
+      const primaryColor = document.getElementById("primaryColor").value;
+      const secondaryColor = document.getElementById("secondaryColor").value;
+      const bgColor = document.getElementById("backgroundColor").value;
+      const textColor = document.getElementById("textColor").value;
+      const accentColor = document.getElementById("accentColor").value;
+      const variants = document.getElementById("variants").value;
+      const borderRadius = document.getElementById("borderRadius").value;
+      const spacing = document.getElementById("spacing").selectedOptions[0].text;
+      const additionalNotes = document.getElementById("additionalNotes").value;
+
+      let outputType = "a single unified SVG file containing grouped elements";
+      if (document.getElementById("separateSVG").checked) outputType = "separate SVG files for each component type";
+      else if (document.getElementById("componentLibrary").checked) outputType = "an organized component library structure";
+
+      const principles = [];
+      const principlesList = ['consistency', 'clarity', 'feedback', 'recognition', 'errorPrevention', 'efficiency', 'hierarchy', 'affordance'];
+      const principleLabels = {
+        consistency: "Consistency & Standards (Nielsen's 4th Heuristic)",
+        clarity: "Clarity & Visibility (Norman's System Visibility)",
+        feedback: "Immediate Visual Feedback (Norman's Feedback Principle)",
+        recognition: "Recognition over Recall (Nielsen's 6th Heuristic)",
+        errorPrevention: "Error Prevention (Nielsen's 5th Heuristic)",
+        efficiency: "Efficiency & Flexibility (Nielsen's 7th Heuristic)",
+        hierarchy: "Clear Visual Hierarchy (Gestalt Psychology)",
+        affordance: "Affordance & Signifiers (Norman's Principles)"
+      };
+      principlesList.forEach(id => { if (document.getElementById(id).checked) principles.push(principleLabels[id]); });
+
+      const gestaltPrinciples = [];
+      const gestaltList = ['proximity', 'similarity', 'closure', 'figureGround', 'continuity', 'commonFate'];
+      const gestaltLabels = {
+        proximity: "Proximity - Related elements are grouped close together",
+        similarity: "Similarity - Similar elements share visual properties",
+        closure: "Closure - Simple shapes that users mentally complete",
+        figureGround: "Figure/Ground - Clear separation from background",
+        continuity: "Continuity - Natural guidance of the eye",
+        commonFate: "Common Fate - Synchronized movement"
+      };
+      gestaltList.forEach(id => { if (document.getElementById(id)?.checked) gestaltPrinciples.push(gestaltLabels[id]); });
+
+      const a11y = [];
+      if (document.getElementById("a11y_contrast").checked) a11y.push("✓ WCAG 2.1 - Guideline 1.4.3: Color contrast (at least 4.5:1)");
+      if (document.getElementById("a11y_focus").checked) a11y.push("✓ WCAG 2.1 - Guideline 2.4.7: Visible focus indicators");
+      if (document.getElementById("a11y_touch").checked) a11y.push("✓ WCAG 2.1 - Guideline 2.5.5: Minimum touch target 44x44px");
+      if (document.getElementById("a11y_labels").checked) a11y.push("✓ WCAG 2.1 - Guideline 4.1.2: Proper ARIA labels");
+      if (document.getElementById("a11y_colorblind").checked) a11y.push("✓ WCAG 2.1 - Guideline 1.4.1: Colorblind friendly");
+      if (document.getElementById("a11y_text_size").checked) a11y.push("✓ WCAG 2.1 - Guideline 1.4.4: Legible text sizes (min 16px)");
+
+      let prompt = `# 🎨 AI UI/UX Design Brief: Comprehensive Component Library
+━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+
+## 📋 General Information
+**Project Leader:** Georgios Korakakis, Assistant Professor
+**Institution:** Uniwa (University of West Attica)
+**Purpose:** Creation of a professional, production-ready UI component library in SVG format.
+
+## 🧩 Components to Design
+${components.map((c, i) => `${i + 1}. ${c}`).join('\n')}
+
+## 🎨 Design Style & Aesthetic
+- **Primary Style**: ${style}
+- **Detail Level**: ${complexity}
+- **Border Radius**: ${borderRadius}px for all interactive elements
+- **Spacing System**: ${spacing}
+
+## 🎨 Color Palette
+- **Primary Color**: ${primaryColor}
+- **Secondary Color**: ${secondaryColor}
+- **Background Color**: ${bgColor}
+- **Text Color**: ${textColor}
+- **Accent/Error Color**: ${accentColor}
+
+## ⚙️ Component Specifications
+- **Variants per Component**: ${variants} different styles
+- **Interaction States**: ${states.join(', ')}
+
+━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+## 🎯 UI/UX DESIGN PRINCIPLES (Theoretical Background)
+━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+${principles.length > 0 ? principles.map((p, i) => `${i + 1}. ${p}`).join('\n') : 'Follow standard UI/UX best practices.'}
+
+${gestaltPrinciples.length > 0 ? '\n## 👁️ GESTALT PERCEPTUAL PRINCIPLES\n' + gestaltPrinciples.map((g, i) => `${i + 1}. ${g}`).join('\n') : ''}
+
+━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+## ♿ ACCESSIBILITY REQUIREMENTS (WCAG 2.1/2.2 Compliance)
+━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+${a11y.length > 0 ? a11y.map((a, i) => `${i + 1}. ${a}`).join('\n') : 'Ensure basic accessibility guidelines.'}
+
+━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+## 🛠️ TECHNICAL REQUIREMENTS (CRITICAL FOR ILLUSTRATOR)
+━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+- **Delivery Format**: ${outputType}.
+- **File Structure**: Clean SVG code with no external dependencies, 100% compatible with Adobe Illustrator.
+- **Illustrator Compatibility (VERY IMPORTANT)**: DO NOT use CSS classes, CSS variables (e.g., var(--color)), or internal <style> tags for colors. Use EXCLUSIVELY direct inline presentation attributes (e.g., fill="${primaryColor}", stroke="#000000"). Otherwise, colors will be lost in Illustrator!
+- **Layer Organization**: Use <g> tags with proper and descriptive naming.
+
+${additionalNotes ? `\n━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━\n## 📝 Additional Requirements\n━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━\n${additionalNotes}` : ''}`;
+
+      document.getElementById("promptText").innerText = prompt;
+      document.getElementById("promptOutput").style.display = "block";
+      document.getElementById("promptOutput").scrollIntoView({ behavior: 'smooth', block: 'nearest' });
+      document.getElementById("svgPreviewSection").classList.add("active");
+    }
+
+    function toggleComparisonMode() {
+      const comparisonMode = document.getElementById('comparisonMode');
+      const isActive = comparisonMode.classList.toggle('active');
+      if (isActive) {
+        generateComparisonPrompts();
+        comparisonMode.scrollIntoView({ behavior: 'smooth', block: 'start' });
+      }
+    }
+
+    function generateComparisonPrompts() {
+      const components = getSelectedText(document.getElementById("componentList"));
+      if (components.length === 0) { alert("⚠️ Please select components first!"); return; }
+
+      const basicPrompt = `Create UI components in SVG format for:
+${components.join(', ')}
+Make them look modern and professional.`;
+
+      const enhancedPrompt = `# 🎨 Theory-Grounded UI Component Library
+
+## Components
+${components.map((c, i) => `${i + 1}. ${c}`).join('\n')}
+
+## Design Principles
+✓ Nielsen's Heuristics (Consistency, Error Prevention)
+✓ Norman's Principles (Visibility, Affordance)
+✓ Gestalt Psychology (Proximity, Similarity)
+
+## Technical Requirements (Illustrator Compatible)
+✓ Inline attributes ONLY (NO CSS variables) to ensure correct rendering!`;
+
+      document.getElementById('basicPrompt').textContent = basicPrompt;
+      document.getElementById('enhancedPrompt').textContent = enhancedPrompt;
+    }
+
+    function copyPrompt() {
+      const promptText = document.getElementById("promptText").innerText;
+      navigator.clipboard.writeText(promptText).then(() => {
+        const btn = document.querySelector('.btn-copy');
+        const originalText = btn.innerText;
+        btn.innerText = '✅ Copied!';
+        btn.style.background = '#10b981';
+        setTimeout(() => { btn.innerText = originalText; btn.style.background = '#667eea'; }, 2000);
+      }).catch(err => {
+        alert('Error copying to clipboard. Please try again.');
+      });
+    }
+
+    // SVG Generation Logic
+    let generatedSvgContent = "";
+
+    async function generateSVG() {
+        const promptText = document.getElementById("promptText").innerText;
+        const canvas = document.getElementById("svgCanvas");
+        const btn = document.getElementById("generateSvgBtn");
+        const downloadBtn = document.getElementById("downloadSvgBtn");
+        const userApiKey = document.getElementById("apiKeyInput").value.trim();
+        const aiCredit = document.getElementById("aiCredit");
+
+        if (!promptText) { alert("⚠️ Please generate the prompt first!"); return; }
+
+        canvas.innerHTML = '<div class="loading-spinner"></div><p style="margin-top:15px; color:#64748b">Generating SVG preview...</p>';
+        btn.disabled = true;
+        btn.innerText = "⏳ Processing...";
+        
+        const apiKey = ""; 
+        const effectiveKey = apiKey || userApiKey;
+
+        if (!effectiveKey) {
+             const isLocal = window.location.protocol === 'file:' || window.location.hostname === 'localhost';
+             if (isLocal) {
+                 alert("⚠️ It seems you are running the file locally. You need to enter the Gemini API Key in the field below.");
+                 canvas.innerHTML = '<div style="text-align: center; color: #94a3b8;"><i class="fas fa-key" style="font-size: 48px; margin-bottom: 10px;"></i><p>Waiting for API Key...</p></div>';
+                 btn.disabled = false;
+                 btn.innerText = "✨ Generate Preview with AI";
+                 return;
+             }
+        }
+
+        const url = `https://generativelanguage.googleapis.com/v1beta/models/gemini-2.5-flash:generateContent?key=${effectiveKey}`;
+        const systemPrompt = `You are an expert UI/UX Designer and SVG Coder. 
+        Your task is to take the provided design brief and write COMPLETE, VALID, STANDALONE SVG code.
+        
+        CRITICAL RULES FOR VALID SVG:
+        1. **ESCAPE SPECIAL CHARACTERS:** Use '&amp;' instead of '&' in text.
+        2. **NO DOUBLE HYPHENS IN COMMENTS:** Use .
+        3. **ILLUSTRATOR COMPATIBILITY:** DO NOT use CSS classes or CSS variables (var(--xxx)) for colors. Use direct presentation attributes ONLY (e.g., fill="#FF0000" stroke="#000000").
+        
+        CRITICAL RULES FOR LAYOUT:
+        1. **VERTICAL STACKING:** Do not overlap elements.
+        2. **VIEWBOX:** Use a tall viewBox, e.g., viewBox="0 0 1200 2000".
+        3. **GROUPING:** Wrap components in <g transform="translate(x, y)">.
+        
+        Return ONLY the raw SVG code.`;
+
+        try {
+            const response = await fetch(url, {
+                method: 'POST',
+                headers: { 'Content-Type': 'application/json' },
+                body: JSON.stringify({
+                    contents: [{ parts: [{ text: `Design brief:\n\n${promptText}\n\nGENERATE SVG.` }] }],
+                    systemInstruction: { parts: [{ text: systemPrompt }] }
+                })
+            });
+
+            if (!response.ok) throw new Error(`API Error: ${response.statusText}`);
+            const data = await response.json();
+            let rawText = data.candidates?.[0]?.content?.parts?.[0]?.text;
+
+            if (rawText) {
+                rawText = rawText.replace(/```xml/g, '').replace(/```svg/g, '').replace(/```/g, '').trim();
+                const svgStart = rawText.indexOf('<svg');
+                const svgEnd = rawText.lastIndexOf('</svg>') + 6;
+                
+                if (svgStart !== -1 && svgEnd !== -1) {
+                    generatedSvgContent = rawText.substring(svgStart, svgEnd);
+                    canvas.innerHTML = generatedSvgContent;
+                    canvas.appendChild(aiCredit);
+                    aiCredit.style.display = "block";
+                    downloadBtn.disabled = false;
+                } else throw new Error("No valid SVG found in the response");
+            } else throw new Error("Empty response from the AI");
+        } catch (error) {
+            canvas.innerHTML = `<div style="color:#ef4444; text-align:center;"><i class="fas fa-exclamation-circle fa-2x"></i><p>Error.<br>${error.message}</p></div>`;
+        } finally {
+            btn.disabled = false;
+            btn.innerHTML = "✨ Generate Preview with AI";
+        }
+    }
+
+    function downloadSVG() {
+        if (!generatedSvgContent) return;
+        const blob = new Blob([generatedSvgContent], { type: 'image/svg+xml' });
+        const url = URL.createObjectURL(blob);
+        const a = document.createElement('a');
+        a.href = url;
+        a.download = 'ui-components.svg';
+        document.body.appendChild(a);
+        a.click();
+        document.body.removeChild(a);
+        URL.revokeObjectURL(url);
+    }
+
+    document.addEventListener('DOMContentLoaded', function() {
+      updateQualityScore();
+      checkColorContrast();
+    });
+  </script>
+</body>
+</html>

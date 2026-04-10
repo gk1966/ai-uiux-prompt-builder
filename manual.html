@@ -1,0 +1,1596 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>User Manual & Pedagogical Framework | AI UI/UX Prompt Builder</title>
+    <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css" rel="stylesheet">
+    <style>
+        :root {
+            --primary: #2E3192;
+            --secondary: #667eea;
+            --accent: #764ba2;
+            --text: #1e293b;
+            --text-light: #64748b;
+            --bg: #f8fafc;
+            --success: #10b981;
+            --warning: #f59e0b;
+            --info: #3b82f6;
+            --sidebar-width: 320px;
+        }
+
+        * {
+            box-sizing: border-box;
+            margin: 0;
+            padding: 0;
+        }
+
+        body {
+            font-family: 'Segoe UI', system-ui, -apple-system, sans-serif;
+            color: var(--text);
+            background: var(--bg);
+            line-height: 1.8;
+            display: flex;
+            min-height: 100vh;
+        }
+
+        /* Top Controls */
+        .top-controls {
+            position: fixed;
+            top: 20px;
+            right: 20px;
+            z-index: 1000;
+            display: flex;
+            gap: 10px;
+        }
+
+        .control-btn {
+            background: white;
+            border: 2px solid var(--primary);
+            padding: 10px 18px;
+            border-radius: 10px;
+            cursor: pointer;
+            font-weight: 600;
+            color: var(--primary);
+            transition: all 0.3s;
+            display: flex;
+            align-items: center;
+            gap: 8px;
+            box-shadow: 0 2px 8px rgba(0,0,0,0.1);
+        }
+
+        .control-btn:hover {
+            background: var(--primary);
+            color: white;
+            transform: translateY(-2px);
+            box-shadow: 0 4px 12px rgba(46, 49, 146, 0.3);
+        }
+
+        /* Sidebar */
+        .sidebar {
+            width: var(--sidebar-width);
+            background: white;
+            border-right: 1px solid #e2e8f0;
+            position: fixed;
+            height: 100vh;
+            overflow-y: auto;
+            padding: 2rem;
+            z-index: 100;
+            box-shadow: 2px 0 10px rgba(0,0,0,0.05);
+        }
+
+        .logo-area {
+            margin-bottom: 2rem;
+            padding-bottom: 1.5rem;
+            border-bottom: 3px solid var(--primary);
+        }
+
+        .logo-title {
+            font-weight: 800;
+            font-size: 1.4rem;
+            background: linear-gradient(135deg, var(--primary), var(--accent));
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+            margin-bottom: 0.5rem;
+        }
+
+        .logo-subtitle {
+            font-size: 0.9rem;
+            color: var(--text-light);
+            font-weight: 500;
+        }
+
+        .version-badge {
+            display: inline-block;
+            background: linear-gradient(135deg, var(--secondary), var(--accent));
+            color: white;
+            padding: 4px 12px;
+            border-radius: 20px;
+            font-size: 0.75rem;
+            font-weight: 700;
+            margin-top: 0.5rem;
+        }
+
+        /* Search Box */
+        .search-box {
+            margin-bottom: 1.5rem;
+            position: relative;
+        }
+
+        .search-box input {
+            width: 100%;
+            padding: 12px 40px 12px 15px;
+            border: 2px solid #e2e8f0;
+            border-radius: 10px;
+            font-size: 0.9rem;
+            transition: all 0.3s;
+        }
+
+        .search-box input:focus {
+            outline: none;
+            border-color: var(--secondary);
+            box-shadow: 0 0 0 3px rgba(102, 126, 234, 0.1);
+        }
+
+        .search-box i {
+            position: absolute;
+            right: 15px;
+            top: 50%;
+            transform: translateY(-50%);
+            color: var(--text-light);
+        }
+
+        /* Navigation */
+        .nav-section-title {
+            font-weight: 700;
+            color: var(--primary);
+            font-size: 0.8rem;
+            text-transform: uppercase;
+            letter-spacing: 0.5px;
+            margin: 1.5rem 0 0.75rem;
+        }
+
+        .nav-links {
+            list-style: none;
+        }
+
+        .nav-item {
+            margin-bottom: 0.25rem;
+        }
+
+        .nav-link {
+            display: flex;
+            align-items: center;
+            gap: 10px;
+            padding: 0.75rem 1rem;
+            color: var(--text-light);
+            text-decoration: none;
+            border-radius: 8px;
+            transition: all 0.2s;
+            font-size: 0.9rem;
+            font-weight: 500;
+            cursor: pointer;
+        }
+
+        .nav-link:hover {
+            background: #f1f5f9;
+            color: var(--text);
+            transform: translateX(3px);
+        }
+
+        .nav-link.active {
+            background: linear-gradient(135deg, #e0e7ff 0%, #ddd6fe 100%);
+            color: var(--primary);
+            font-weight: 600;
+        }
+
+        .nav-link i {
+            width: 20px;
+        }
+
+        /* Main Content */
+        .main-content {
+            margin-left: var(--sidebar-width);
+            flex: 1;
+            padding: 3rem 4rem;
+            max-width: 1400px;
+        }
+
+        section {
+            margin-bottom: 5rem;
+            scroll-margin-top: 2rem;
+            display: none;
+        }
+
+        section.active {
+            display: block;
+            animation: fadeInUp 0.5s ease;
+        }
+
+        @keyframes fadeInUp {
+            from {
+                opacity: 0;
+                transform: translateY(30px);
+            }
+            to {
+                opacity: 1;
+                transform: translateY(0);
+            }
+        }
+
+        h1 {
+            font-size: 2.8rem;
+            margin-bottom: 1rem;
+            color: var(--primary);
+            line-height: 1.2;
+            font-weight: 800;
+        }
+
+        h2 {
+            font-size: 2rem;
+            margin: 2.5rem 0 1.5rem;
+            color: var(--primary);
+            display: flex;
+            align-items: center;
+            gap: 12px;
+            padding-bottom: 0.75rem;
+            border-bottom: 3px solid #e0e7ff;
+        }
+
+        h3 {
+            font-size: 1.4rem;
+            margin: 2rem 0 1rem;
+            color: #334155;
+            font-weight: 700;
+        }
+
+        h4 {
+            font-size: 1.1rem;
+            margin: 1.5rem 0 0.75rem;
+            color: #475569;
+            font-weight: 600;
+        }
+
+        p {
+            margin-bottom: 1.5rem;
+            color: #475569;
+            font-size: 1.05rem;
+        }
+
+        /* Hero Section */
+        .hero-section {
+            background: linear-gradient(135deg, var(--primary) 0%, var(--accent) 100%);
+            color: white;
+            padding: 3rem;
+            border-radius: 20px;
+            margin-bottom: 3rem;
+            box-shadow: 0 10px 40px rgba(46, 49, 146, 0.3);
+        }
+
+        .hero-section h1 {
+            color: white;
+        }
+
+        .hero-section p {
+            color: rgba(255, 255, 255, 0.95);
+            font-size: 1.2rem;
+            line-height: 1.8;
+        }
+
+        /* Info Boxes */
+        .info-box {
+            background: linear-gradient(135deg, #eff6ff 0%, #e0f2fe 100%);
+            border-left: 5px solid var(--info);
+            padding: 1.5rem;
+            border-radius: 12px;
+            margin: 2rem 0;
+        }
+
+        .info-box.pedagogical {
+            background: linear-gradient(135deg, #fef3c7 0%, #fef08a 100%);
+            border-left-color: var(--warning);
+        }
+
+        .info-box.success {
+            background: linear-gradient(135deg, #d1fae5 0%, #a7f3d0 100%);
+            border-left-color: var(--success);
+        }
+
+        .info-box h4 {
+            color: var(--primary);
+            margin-top: 0;
+            display: flex;
+            align-items: center;
+            gap: 8px;
+        }
+
+        /* Feature Cards */
+        .features-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(280px, 1fr));
+            gap: 1.5rem;
+            margin: 2rem 0;
+        }
+
+        .feature-card {
+            background: white;
+            border: 2px solid #e2e8f0;
+            border-radius: 15px;
+            padding: 1.5rem;
+            transition: all 0.3s;
+            box-shadow: 0 2px 8px rgba(0,0,0,0.05);
+        }
+
+        .feature-card:hover {
+            transform: translateY(-5px);
+            border-color: var(--secondary);
+            box-shadow: 0 8px 25px rgba(102, 126, 234, 0.2);
+        }
+
+        .feature-icon {
+            font-size: 2.5rem;
+            background: linear-gradient(135deg, var(--secondary), var(--accent));
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+            margin-bottom: 1rem;
+        }
+
+        .feature-card h3 {
+            color: var(--primary);
+            margin-top: 0;
+            font-size: 1.2rem;
+        }
+
+        .feature-card p {
+            color: var(--text-light);
+            font-size: 0.95rem;
+            margin-bottom: 0;
+        }
+
+        /* Theory Cards - Expandable */
+        .theory-section {
+            margin: 2rem 0;
+        }
+
+        .theory-card {
+            border: 2px solid #e2e8f0;
+            border-radius: 15px;
+            margin-bottom: 1rem;
+            overflow: hidden;
+            transition: all 0.3s;
+            background: white;
+        }
+
+        .theory-card:hover {
+            border-color: var(--secondary);
+            box-shadow: 0 4px 15px rgba(0,0,0,0.08);
+        }
+
+        .theory-header {
+            padding: 1.5rem;
+            cursor: pointer;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            background: linear-gradient(135deg, #f8fafc 0%, #f1f5f9 100%);
+            transition: all 0.3s;
+        }
+
+        .theory-header:hover {
+            background: linear-gradient(135deg, #e0e7ff 0%, #ddd6fe 100%);
+        }
+
+        .theory-title {
+            display: flex;
+            align-items: center;
+            gap: 12px;
+            flex: 1;
+        }
+
+        .theory-title h3 {
+            margin: 0;
+            color: var(--primary);
+            font-size: 1.3rem;
+        }
+
+        .theory-badge {
+            background: linear-gradient(135deg, var(--secondary), var(--accent));
+            color: white;
+            padding: 5px 15px;
+            border-radius: 20px;
+            font-size: 0.8rem;
+            font-weight: 700;
+        }
+
+        .expand-icon {
+            font-size: 1.5rem;
+            color: var(--secondary);
+            transition: transform 0.3s;
+        }
+
+        .theory-card.expanded .expand-icon {
+            transform: rotate(180deg);
+        }
+
+        .theory-content {
+            max-height: 0;
+            overflow: hidden;
+            transition: max-height 0.5s ease;
+            padding: 0 1.5rem;
+        }
+
+        .theory-card.expanded .theory-content {
+            max-height: 2000px;
+            padding: 1.5rem;
+        }
+
+        .theory-content h4 {
+            color: var(--secondary);
+            margin-top: 1.5rem;
+        }
+
+        .theory-content h4:first-child {
+            margin-top: 0;
+        }
+
+        /* Application Examples */
+        .application-box {
+            background: #f8fafc;
+            border-left: 4px solid var(--success);
+            padding: 1rem 1.5rem;
+            margin: 1rem 0;
+            border-radius: 0 8px 8px 0;
+        }
+
+        .application-box strong {
+            color: var(--success);
+        }
+
+        /* Lists */
+        ul, ol {
+            margin-left: 2rem;
+            margin-bottom: 1.5rem;
+        }
+
+        ul li, ol li {
+            margin-bottom: 0.75rem;
+            color: #475569;
+            line-height: 1.8;
+        }
+
+        ul li strong, ol li strong {
+            color: var(--primary);
+        }
+
+        /* Citations */
+        .citation {
+            padding: 1.5rem;
+            margin: 1rem 0;
+            background: linear-gradient(135deg, #fef3c7 0%, #fef08a 100%);
+            border-left: 4px solid var(--warning);
+            border-radius: 0 12px 12px 0;
+            font-family: Georgia, serif;
+            font-style: italic;
+            color: #78350f;
+            font-size: 0.95rem;
+            line-height: 1.8;
+        }
+
+        .citation-author {
+            font-weight: 700;
+            font-style: normal;
+        }
+
+        /* References Section */
+        .references-list {
+            background: white;
+            border: 2px solid #e2e8f0;
+            border-radius: 15px;
+            padding: 2rem;
+        }
+
+        .reference-item {
+            padding: 1rem 0;
+            border-bottom: 1px solid #e2e8f0;
+            font-family: Georgia, serif;
+        }
+
+        .reference-item:last-child {
+            border-bottom: none;
+        }
+
+        .reference-item strong {
+            color: var(--primary);
+        }
+
+        /* Workflow Steps */
+        .workflow-step {
+            background: white;
+            border: 2px solid #e2e8f0;
+            border-radius: 15px;
+            padding: 1.5rem;
+            margin: 1.5rem 0;
+            position: relative;
+            padding-left: 4rem;
+        }
+
+        .step-number {
+            position: absolute;
+            left: 1.5rem;
+            top: 1.5rem;
+            width: 40px;
+            height: 40px;
+            background: linear-gradient(135deg, var(--secondary), var(--accent));
+            color: white;
+            border-radius: 50%;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-weight: 700;
+            font-size: 1.2rem;
+        }
+
+        .workflow-step h4 {
+            margin-top: 0;
+            color: var(--primary);
+        }
+
+        /* Table */
+        table {
+            width: 100%;
+            border-collapse: collapse;
+            margin: 2rem 0;
+            background: white;
+            border-radius: 15px;
+            overflow: hidden;
+            box-shadow: 0 2px 8px rgba(0,0,0,0.05);
+        }
+
+        thead {
+            background: linear-gradient(135deg, var(--primary), var(--accent));
+            color: white;
+        }
+
+        th, td {
+            padding: 1rem 1.5rem;
+            text-align: left;
+            border-bottom: 1px solid #e2e8f0;
+        }
+
+        th {
+            font-weight: 700;
+            font-size: 1.05rem;
+        }
+
+        tbody tr {
+            transition: background 0.2s;
+        }
+
+        tbody tr:hover {
+            background: #f8fafc;
+        }
+
+        /* Code Blocks */
+        code {
+            background: #1e293b;
+            color: #f1f5f9;
+            padding: 3px 8px;
+            border-radius: 5px;
+            font-family: 'Courier New', monospace;
+            font-size: 0.9rem;
+        }
+
+        /* Navigation Buttons */
+        .nav-buttons {
+            display: flex;
+            justify-content: space-between;
+            margin-top: 3rem;
+            padding-top: 2rem;
+            border-top: 2px solid #e2e8f0;
+        }
+
+        .nav-btn {
+            background: var(--primary);
+            color: white;
+            border: none;
+            padding: 14px 28px;
+            border-radius: 10px;
+            cursor: pointer;
+            font-weight: 600;
+            font-size: 1rem;
+            transition: all 0.3s;
+            display: flex;
+            align-items: center;
+            gap: 10px;
+            box-shadow: 0 4px 12px rgba(46, 49, 146, 0.3);
+        }
+
+        .nav-btn:hover {
+            background: var(--secondary);
+            transform: translateY(-2px);
+            box-shadow: 0 6px 20px rgba(102, 126, 234, 0.4);
+        }
+
+        .nav-btn:disabled {
+            background: #cbd5e1;
+            cursor: not-allowed;
+            transform: none;
+            box-shadow: none;
+        }
+
+        /* Footer */
+        .footer {
+            background: linear-gradient(135deg, #f8fafc 0%, #e0e7ff 100%);
+            border-top: 3px solid var(--primary);
+            padding: 2.5rem;
+            margin-top: 4rem;
+            border-radius: 15px;
+            text-align: center;
+        }
+
+        .footer p {
+            color: var(--text-light);
+            margin-bottom: 0.5rem;
+        }
+
+        .footer strong {
+            color: var(--primary);
+            font-size: 1.1rem;
+        }
+
+        /* Mobile Toggle */
+        .mobile-toggle {
+            display: none;
+            position: fixed;
+            top: 1rem;
+            left: 1rem;
+            z-index: 200;
+            background: white;
+            padding: 1rem;
+            border-radius: 10px;
+            box-shadow: 0 4px 12px rgba(0,0,0,0.15);
+            cursor: pointer;
+            border: 2px solid var(--primary);
+        }
+
+        /* Print Styles */
+        @media print {
+            .sidebar, .top-controls, .nav-buttons, .mobile-toggle, .nav-btn {
+                display: none !important;
+            }
+            .main-content {
+                margin-left: 0;
+                padding: 1rem;
+            }
+            section {
+                display: block !important;
+                page-break-inside: avoid;
+            }
+            .theory-content {
+                max-height: none !important;
+                padding: 1.5rem !important;
+            }
+            h1, h2, h3 {
+                page-break-after: avoid;
+            }
+        }
+
+        /* Responsive */
+        @media (max-width: 1024px) {
+            .sidebar {
+                transform: translateX(-100%);
+                transition: transform 0.3s;
+            }
+            .sidebar.active {
+                transform: translateX(0);
+            }
+            .main-content {
+                margin-left: 0;
+                padding: 2rem 1.5rem;
+            }
+            .mobile-toggle {
+                display: block;
+            }
+            .top-controls {
+                top: 70px;
+                right: 10px;
+            }
+            h1 {
+                font-size: 2rem;
+            }
+            h2 {
+                font-size: 1.5rem;
+            }
+            .features-grid {
+                grid-template-columns: 1fr;
+            }
+        }
+
+        /* Highlight on search */
+        .highlight {
+            background: #fef08a;
+            padding: 2px 4px;
+            border-radius: 3px;
+        }
+
+        /* Scroll to top button */
+        .scroll-top {
+            position: fixed;
+            bottom: 2rem;
+            right: 2rem;
+            background: var(--primary);
+            color: white;
+            width: 50px;
+            height: 50px;
+            border-radius: 50%;
+            display: none;
+            align-items: center;
+            justify-content: center;
+            cursor: pointer;
+            box-shadow: 0 4px 12px rgba(46, 49, 146, 0.3);
+            transition: all 0.3s;
+            z-index: 99;
+        }
+
+        .scroll-top:hover {
+            background: var(--secondary);
+            transform: translateY(-3px);
+        }
+
+        .scroll-top.visible {
+            display: flex;
+        }
+    </style>
+</head>
+<body>
+
+    <div class="top-controls">
+        <button class="control-btn" onclick="window.print()">
+            <i class="fas fa-print"></i>
+            <span>PDF</span>
+        </button>
+        <button class="control-btn" onclick="expandAll()">
+            <i class="fas fa-expand-alt"></i>
+            <span>All</span>
+        </button>
+    </div>
+
+    <button class="mobile-toggle" onclick="document.querySelector('.sidebar').classList.toggle('active')">
+        <i class="fas fa-bars fa-lg"></i>
+    </button>
+
+    <nav class="sidebar">
+        <div class="logo-area">
+            <div class="logo-title">AI UI/UX Prompt Builder</div>
+            <div class="logo-subtitle">User Manual & Pedagogical Framework</div>
+            <div class="version-badge">v3.3 Educational Edition</div>
+        </div>
+
+        <div class="search-box">
+            <input type="text" id="searchInput" placeholder="Search..." onkeyup="searchContent()">
+            <i class="fas fa-search"></i>
+        </div>
+
+        <div class="nav-section-title">CONTENTS</div>
+        
+        <ul class="nav-links">
+            <li class="nav-item">
+                <a class="nav-link active" data-section="intro">
+                    <i class="fas fa-home"></i>
+                    <span>Introduction</span>
+                </a>
+            </li>
+            <li class="nav-item">
+                <a class="nav-link" data-section="features">
+                    <i class="fas fa-star"></i>
+                    <span>Features</span>
+                </a>
+            </li>
+            <li class="nav-item">
+                <a class="nav-link" data-section="theory">
+                    <i class="fas fa-brain"></i>
+                    <span>Theoretical Framework</span>
+                </a>
+            </li>
+            <li class="nav-item">
+                <a class="nav-link" data-section="workflow">
+                    <i class="fas fa-cogs"></i>
+                    <span>Workflow</span>
+                </a>
+            </li>
+            <li class="nav-item">
+                <a class="nav-link" data-section="accessibility">
+                    <i class="fas fa-universal-access"></i>
+                    <span>Accessibility</span>
+                </a>
+            </li>
+            <li class="nav-item">
+                <a class="nav-link" data-section="technical">
+                    <i class="fas fa-laptop-code"></i>
+                    <span>Technical Details</span>
+                </a>
+            </li>
+            <li class="nav-item">
+                <a class="nav-link" data-section="references">
+                    <i class="fas fa-book"></i>
+                    <span>References</span>
+                </a>
+            </li>
+        </ul>
+
+        <div class="nav-section-title" style="margin-top: 2rem;">INFORMATION</div>
+        
+        <ul class="nav-links">
+            <li class="nav-item">
+                <a class="nav-link" data-section="about">
+                    <i class="fas fa-info-circle"></i>
+                    <span>About</span>
+                </a>
+            </li>
+        </ul>
+    </nav>
+
+    <main class="main-content">
+
+        <section id="intro" class="active">
+            <div class="hero-section">
+                <h1>User Manual & Pedagogical Framework</h1>
+                <p>
+                    Comprehensive documentation of the <strong>"AI UI/UX Prompt Builder"</strong> educational tool 
+                    for teaching Interactive Design through structured AI prompt construction.
+                </p>
+            </div>
+
+            <div class="info-box pedagogical">
+                <h4><i class="fas fa-graduation-cap"></i> Pedagogical Goal</h4>
+                <p>
+                    This tool transforms the "black box" of AI prompting into a structured learning experience. 
+                    It forces users to articulate their <strong>design intent</strong> (e.g., "Why use this hierarchy?") 
+                    before generating the technical artifact, effectively externalizing tacit design knowledge.
+                </p>
+            </div>
+
+            <h2><i class="fas fa-bullseye"></i> What is the AI UI/UX Prompt Builder?</h2>
+
+            <p>
+                The <strong>AI UI/UX Prompt Builder</strong> is a web-based educational tool designed to help design students 
+                translate theoretical knowledge into practical, machine-understandable instructions for Generative AI systems. 
+                Instead of relying on trial and error, the tool provides a structured approach that integrates principles from 
+                <strong>Nielsen (Usability Heuristics)</strong>, <strong>Norman (Design Principles)</strong>, 
+                <strong>Gestalt (Perceptual Psychology)</strong>, and <strong>WCAG (Web Content Accessibility Guidelines)</strong>.
+            </p>
+
+            <div class="info-box">
+                <h4><i class="fas fa-lightbulb"></i> Core Concept</h4>
+                <p>
+                    Prompt construction is not mere linguistic manipulation, but a fundamental extension of 
+                    <strong>design literacy</strong>. The ability to construct effective prompts requires the same 
+                    rigorous understanding of design principles - such as consistency, hierarchy, and accessibility - 
+                    as traditional manual creation.
+                </p>
+            </div>
+
+            <div class="nav-buttons">
+                <button class="nav-btn" disabled>
+                    <i class="fas fa-arrow-left"></i>
+                    <span>Previous</span>
+                </button>
+                <button class="nav-btn" onclick="nextSection()">
+                    <span>Next</span>
+                    <i class="fas fa-arrow-right"></i>
+                </button>
+            </div>
+        </section>
+
+        <section id="features">
+            <h2><i class="fas fa-star"></i> System Capabilities & Features</h2>
+
+            <p>
+                The application goes beyond simple text generation, offering a suite of educational and 
+                technical capabilities that support the learning process:
+            </p>
+
+            <div class="features-grid">
+                <div class="feature-card">
+                    <div class="feature-icon"><i class="fas fa-sliders-h"></i></div>
+                    <h3>Structured Parameterization</h3>
+                    <p>
+                        Converts abstract design requirements (e.g., "make it friendly") into measurable 
+                        variables (border-radius, color saturation, spacing systems).
+                    </p>
+                </div>
+
+                <div class="feature-card">
+                    <div class="feature-icon"><i class="fas fa-chart-line"></i></div>
+                    <h3>Real-Time Quality Scoring</h3>
+                    <p>
+                        A gamified assessment engine that evaluates prompt completeness across 5 axes: 
+                        Components (20), Principles (25), Accessibility (30), Gestalt (15), Contrast (10).
+                    </p>
+                </div>
+
+                <div class="feature-card">
+                    <div class="feature-icon"><i class="fas fa-image"></i></div>
+                    <h3>SVG Preview Generation</h3>
+                    <p>
+                        Uses a connected LLM (Gemini/Claude) to instantly render the prompt into 
+                        vector graphics (SVG), allowing immediate visual verification of efficacy.
+                    </p>
+                </div>
+
+                <div class="feature-card">
+                    <div class="feature-icon"><i class="fas fa-user-graduate"></i></div>
+                    <h3>Reflective Scaffolding</h3>
+                    <p>
+                        Mandatory reflection prompts that interrupt the "click-and-generate" flow, 
+                        requiring students to justify their theoretical choices before final output.
+                    </p>
+                </div>
+
+                <div class="feature-card">
+                    <div class="feature-icon"><i class="fas fa-balance-scale"></i></div>
+                    <h3>Comparative Mode</h3>
+                    <p>
+                        Displays side-by-side comparison between "naive prompt" (free-form) and 
+                        "theory-grounded prompt" (structured), highlighting critical differences.
+                    </p>
+                </div>
+
+                <div class="feature-card">
+                    <div class="feature-icon"><i class="fas fa-universal-access"></i></div>
+                    <h3>WCAG Compliance Enforcer</h3>
+                    <p>
+                        Algorithmic contrast checker that prevents prompt generation if the selected 
+                        color palette fails to meet WCAG AA standards (4.5:1 ratio).
+                    </p>
+                </div>
+            </div>
+
+            <div class="nav-buttons">
+                <button class="nav-btn" onclick="previousSection()">
+                    <i class="fas fa-arrow-left"></i>
+                    <span>Previous</span>
+                </button>
+                <button class="nav-btn" onclick="nextSection()">
+                    <span>Next</span>
+                    <i class="fas fa-arrow-right"></i>
+                </button>
+            </div>
+        </section>
+
+        <section id="theory">
+            <h2><i class="fas fa-brain"></i> Theoretical Framework</h2>
+
+            <p>
+                The development of the proposed pedagogical tool is grounded in three foundational pillars of 
+                Human-Computer Interaction (HCI), which serve as the "scaffolding" for the generated prompts:
+            </p>
+
+            <div class="theory-section">
+                <div class="theory-card" onclick="toggleTheory(this)">
+                    <div class="theory-header">
+                        <div class="theory-title">
+                            <h3>Usability Heuristics</h3>
+                            <span class="theory-badge">Nielsen, 1994</span>
+                        </div>
+                        <i class="fas fa-chevron-down expand-icon"></i>
+                    </div>
+                    <div class="theory-content">
+                        <p>
+                            Jakob Nielsen's usability heuristics provide a robust vocabulary for evaluating interface quality. 
+                            In the context of AI prompting, heuristics such as <strong>"Consistency and Standards"</strong> 
+                            and <strong>"Error Prevention"</strong> are often overlooked by novice users.
+                        </p>
+
+                        <h4>Application in Tool:</h4>
+
+                        <div class="application-box">
+                            <p>
+                                <strong>Consistency (#4):</strong> The tool enforces global design tokens for spacing 
+                                and typography, ensuring all elements follow the same system.
+                            </p>
+                        </div>
+
+                        <div class="application-box">
+                            <p>
+                                <strong>Error Prevention (#5):</strong> Generates prompts that explicitly request 
+                                "disabled" and "validation" states for forms, preventing common usability errors.
+                            </p>
+                        </div>
+
+                        <div class="application-box">
+                            <p>
+                                <strong>Recognition over Recall (#6):</strong> Mandates visible labels and standard 
+                                iconography, reducing cognitive load.
+                            </p>
+                        </div>
+
+                        <div class="citation">
+                            <span class="citation-author">Nielsen, J.</span> (1994). Usability engineering. 
+                            Morgan Kaufmann Publishers Inc.
+                        </div>
+                    </div>
+                </div>
+
+                <div class="theory-card" onclick="toggleTheory(this)">
+                    <div class="theory-header">
+                        <div class="theory-title">
+                            <h3>Design Principles</h3>
+                            <span class="theory-badge">Norman, 2013</span>
+                        </div>
+                        <i class="fas fa-chevron-down expand-icon"></i>
+                    </div>
+                    <div class="theory-content">
+                        <p>
+                            Donald Norman's principles emphasize affordance, feedback, and visibility - creating 
+                            systems that are intuitive and reduce cognitive load for users.
+                        </p>
+
+                        <h4>Application in Tool:</h4>
+
+                        <div class="application-box">
+                            <p>
+                                <strong>Affordance:</strong> The tool adds specific instructions for visual cues 
+                                (shadows/borders) that signal clickability.
+                            </p>
+                        </div>
+
+                        <div class="application-box">
+                            <p>
+                                <strong>Feedback:</strong> Automatically requests "hover", "pressed", and "loading" 
+                                states for all interactive elements, ensuring immediate feedback.
+                            </p>
+                        </div>
+
+                        <div class="application-box">
+                            <p>
+                                <strong>Visibility:</strong> Enforces display of system status, keeping users 
+                                informed about what is happening.
+                            </p>
+                        </div>
+
+                        <div class="citation">
+                            <span class="citation-author">Norman, D. A.</span> (2013). The design of everyday things: 
+                            Revised and expanded edition. Basic Books.
+                        </div>
+                    </div>
+                </div>
+
+                <div class="theory-card" onclick="toggleTheory(this)">
+                    <div class="theory-header">
+                        <div class="theory-title">
+                            <h3>Gestalt Psychology</h3>
+                            <span class="theory-badge">Wertheimer, 1923</span>
+                        </div>
+                        <i class="fas fa-chevron-down expand-icon"></i>
+                    </div>
+                    <div class="theory-content">
+                        <p>
+                            Gestalt principles describe how humans naturally perceive and organize visual elements. 
+                            These psychological principles help create interfaces that align with natural human perception.
+                        </p>
+
+                        <h4>Application in Tool:</h4>
+
+                        <div class="application-box">
+                            <p>
+                                <strong>Proximity:</strong> Translated into "Spacing System" variables (e.g., 8px base grid), 
+                                ensuring related elements are visually grouped.
+                            </p>
+                        </div>
+
+                        <div class="application-box">
+                            <p>
+                                <strong>Similarity:</strong> Applied through consistent styles for elements with similar 
+                                function, using common colors, sizes, and shapes.
+                            </p>
+                        </div>
+
+                        <div class="application-box">
+                            <p>
+                                <strong>Common Region:</strong> Instructs the AI to use "Cards" and "Containers" for 
+                                grouping related content.
+                            </p>
+                        </div>
+
+                        <div class="application-box">
+                            <p>
+                                <strong>Figure/Ground:</strong> Ensures clear separation between content and background 
+                                through contrast and visual hierarchy.
+                            </p>
+                        </div>
+
+                        <div class="citation">
+                            <span class="citation-author">Wertheimer, M.</span> (1923). Laws of organization in 
+                            perceptual forms. <em>Psychologische Forschung</em>, 4, 301-350.
+                        </div>
+                    </div>
+                </div>
+
+                <div class="theory-card" onclick="toggleTheory(this)">
+                    <div class="theory-header">
+                        <div class="theory-title">
+                            <h3>Accessibility Standards</h3>
+                            <span class="theory-badge">WCAG 2.1/2.2</span>
+                        </div>
+                        <i class="fas fa-chevron-down expand-icon"></i>
+                    </div>
+                    <div class="theory-content">
+                        <p>
+                            The Web Content Accessibility Guidelines (WCAG) provide a single shared standard for 
+                            web content accessibility. They meet the needs of individuals, organizations, and 
+                            governments internationally.
+                        </p>
+
+                        <h4>Application in Tool:</h4>
+
+                        <div class="application-box">
+                            <p>
+                                <strong>Color Contrast (1.4.3):</strong> Algorithmic check that enforces minimum 
+                                4.5:1 contrast for normal text, preventing prompt generation if it fails.
+                            </p>
+                        </div>
+
+                        <div class="application-box">
+                            <p>
+                                <strong>Touch Target Size (2.5.5):</strong> Enforces minimum 44x44px size for 
+                                touch targets, ensuring touch usability.
+                            </p>
+                        </div>
+
+                        <div class="application-box">
+                            <p>
+                                <strong>Semantic Structure (4.1.2):</strong> Automatically requests semantic HTML 
+                                tags and ARIA attributes, making output screen-reader ready.
+                            </p>
+                        </div>
+
+                        <div class="application-box">
+                            <p>
+                                <strong>Use of Color (1.4.1):</strong> Ensures color is not the only means of 
+                                conveying information, supporting users with color blindness.
+                            </p>
+                        </div>
+
+                        <div class="citation">
+                            <span class="citation-author">W3C.</span> (2018). Web Content Accessibility Guidelines 
+                            (WCAG) 2.1. World Wide Web Consortium. 
+                            <a href="https://www.w3.org/TR/WCAG21/" target="_blank">https://www.w3.org/TR/WCAG21/</a>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <div class="nav-buttons">
+                <button class="nav-btn" onclick="previousSection()">
+                    <i class="fas fa-arrow-left"></i>
+                    <span>Previous</span>
+                </button>
+                <button class="nav-btn" onclick="nextSection()">
+                    <span>Next</span>
+                    <i class="fas fa-arrow-right"></i>
+                </button>
+            </div>
+        </section>
+
+        <section id="workflow">
+            <h2><i class="fas fa-cogs"></i> How It Works (Workflow)</h2>
+
+            <p>
+                The application guides the user through a 5-stage pedagogical process that mirrors the 
+                professional design workflow:
+            </p>
+
+            <div class="workflow-step">
+                <div class="step-number">1</div>
+                <h4>Contextual Definition</h4>
+                <p>
+                    The user selects specific UI components (e.g., "Navigation Bar", "Product Card") and defines 
+                    the aesthetic style. The mechanism filters available parameters based on the selected style 
+                    (e.g., "Glassmorphism" enables blur settings).
+                </p>
+            </div>
+
+            <div class="workflow-step">
+                <div class="step-number">2</div>
+                <h4>Theoretical Alignment</h4>
+                <p>
+                    The user must actively select which HCI principles to apply. Tooltips provide immediate 
+                    definitions ("Just-in-time learning"). Selecting "Error Prevention" injects specific natural 
+                    language instructions into the prompt buffer. This phase is critical for connecting theory to practice.
+                </p>
+            </div>
+
+            <div class="workflow-step">
+                <div class="step-number">3</div>
+                <h4>Verification & Reflection</h4>
+                <p>
+                    Before generation, the <strong>Quality Score</strong> provides feedback. If contrast fails 
+                    WCAG AA, the user is blocked or warned. The <strong>Reflection Prompt</strong> asks "Why?" - 
+                    through real-time algorithmic analysis of selected parameters.
+                </p>
+            </div>
+
+            <div class="workflow-step">
+                <div class="step-number">4</div>
+                <h4>Synthesis</h4>
+                <p>
+                    The tool aggregates all data into a "Pedagogically Annotated Prompt". The prompt is formatted 
+                    in Markdown with specific "Role-Play" instructions for the AI, including theoretical 
+                    justifications for each choice.
+                </p>
+            </div>
+
+            <div class="workflow-step">
+                <div class="step-number">5</div>
+                <h4>Visualization</h4>
+                <p>
+                    The prompt can be immediately rendered to SVG via API (Gemini/Claude), allowing students to 
+                    visually verify the effectiveness of their theoretical choices.
+                </p>
+            </div>
+
+            <div class="nav-buttons">
+                <button class="nav-btn" onclick="previousSection()">
+                    <i class="fas fa-arrow-left"></i>
+                    <span>Previous</span>
+                </button>
+                <button class="nav-btn" onclick="nextSection()">
+                    <span>Next</span>
+                    <i class="fas fa-arrow-right"></i>
+                </button>
+            </div>
+        </section>
+
+        <section id="accessibility">
+            <h2><i class="fas fa-universal-access"></i> Accessibility Standards (WCAG)</h2>
+
+            <p>
+                The tool ensures inclusive design by strictly adhering to the 
+                <strong>Web Content Accessibility Guidelines (WCAG) 2.1</strong>.
+            </p>
+
+            <table>
+                <thead>
+                    <tr>
+                        <th>Mechanism</th>
+                        <th>Description</th>
+                        <th>WCAG Criterion</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    <tr>
+                        <td><strong>Algorithmic Contrast Check</strong></td>
+                        <td>Calculates relative luminance of foreground/background colors in real-time. 
+                            Enforces 4.5:1 ratio for normal text (WCAG AA).</td>
+                        <td>1.4.3 (Contrast Minimum)</td>
+                    </tr>
+                    <tr>
+                        <td><strong>Semantic Structure</strong></td>
+                        <td>Prompts automatically request semantic HTML tags (<code>&lt;nav&gt;</code>, 
+                            <code>&lt;button&gt;</code>) and ARIA attributes, ensuring output is 
+                            screen-reader ready.</td>
+                        <td>4.1.2 (Name, Role, Value)</td>
+                    </tr>
+                    <tr>
+                        <td><strong>Touch Target Enforcement</strong></td>
+                        <td>Enforces minimum 44x44px size for all interactive elements, ensuring 
+                            touch usability.</td>
+                        <td>2.5.5 (Target Size)</td>
+                    </tr>
+                    <tr>
+                        <td><strong>Use of Color</strong></td>
+                        <td>Ensures color is not the only means of conveying information, supporting 
+                            users with color blindness.</td>
+                        <td>1.4.1 (Use of Color)</td>
+                    </tr>
+                    <tr>
+                        <td><strong>Text Resize</strong></td>
+                        <td>Enforces minimum 16px for body text and ensures scalable typography up to 
+                            200% without loss of functionality.</td>
+                        <td>1.4.4 (Resize Text)</td>
+                    </tr>
+                </tbody>
+            </table>
+
+            <div class="nav-buttons">
+                <button class="nav-btn" onclick="previousSection()">
+                    <i class="fas fa-arrow-left"></i>
+                    <span>Previous</span>
+                </button>
+                <button class="nav-btn" onclick="nextSection()">
+                    <span>Next</span>
+                    <i class="fas fa-arrow-right"></i>
+                </button>
+            </div>
+        </section>
+
+        <section id="technical">
+            <h2><i class="fas fa-laptop-code"></i> Technical Details</h2>
+
+            <h3>Application Architecture</h3>
+
+            <p>
+                The <strong>AI UI/UX Prompt Builder</strong> is a web-based application using vanilla 
+                HTML, CSS, and JavaScript without framework dependencies. The absence of dependencies ensures:
+            </p>
+
+            <ul>
+                <li><strong>Reliability:</strong> No risk of deprecated dependencies</li>
+                <li><strong>Speed:</strong> Fast loading without overhead</li>
+                <li><strong>Educational Transparency:</strong> Students can read the source code</li>
+                <li><strong>Accessibility:</strong> Works anywhere without build process</li>
+            </ul>
+
+            <h3>Quality Scoring Algorithm</h3>
+
+            <p>
+                The scoring system calculates a 0-100 score based on 5 dimensions:
+            </p>
+
+            <table>
+                <thead>
+                    <tr>
+                        <th>Dimension</th>
+                        <th>Weight</th>
+                        <th>Description</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    <tr>
+                        <td>Components</td>
+                        <td>20%</td>
+                        <td>Number of selected UI components</td>
+                    </tr>
+                    <tr>
+                        <td>UI/UX Principles</td>
+                        <td>25%</td>
+                        <td>Number of applied principles (Nielsen, Norman)</td>
+                    </tr>
+                    <tr>
+                        <td>Accessibility</td>
+                        <td>30%</td>
+                        <td>Number of enabled WCAG standards</td>
+                    </tr>
+                    <tr>
+                        <td>Gestalt Principles</td>
+                        <td>15%</td>
+                        <td>Number of applied Gestalt principles</td>
+                    </tr>
+                    <tr>
+                        <td>Color Contrast</td>
+                        <td>10%</td>
+                        <td>Result of WCAG contrast check</td>
+                    </tr>
+                </tbody>
+            </table>
+
+            <div class="info-box">
+                <h4><i class="fas fa-code"></i> SVG Generation</h4>
+                <p>
+                    The preview capability uses the Gemini API (flash model) to render the prompt into 
+                    SVG code. The application includes a pre-configured Gemini API key for use in the 
+                    claude.ai environment, but users who download the file can add their own API key 
+                    for local use.
+                </p>
+            </div>
+
+            <div class="nav-buttons">
+                <button class="nav-btn" onclick="previousSection()">
+                    <i class="fas fa-arrow-left"></i>
+                    <span>Previous</span>
+                </button>
+                <button class="nav-btn" onclick="nextSection()">
+                    <span>Next</span>
+                    <i class="fas fa-arrow-right"></i>
+                </button>
+            </div>
+        </section>
+
+        <section id="references">
+            <h2><i class="fas fa-book"></i> References</h2>
+
+            <p>
+                The development of this tool is supported by the following academic literature:
+            </p>
+
+            <div class="references-list">
+                <div class="reference-item">
+                    <strong>Nielsen, J.</strong> (1994). <em>Usability engineering</em>. Morgan Kaufmann Publishers Inc.
+                </div>
+
+                <div class="reference-item">
+                    <strong>Norman, D. A.</strong> (2013). <em>The design of everyday things: Revised and expanded edition</em>. 
+                    Basic Books.
+                </div>
+
+                <div class="reference-item">
+                    <strong>Wertheimer, M.</strong> (1923). Laws of organization in perceptual forms. 
+                    <em>Psychologische Forschung</em>, 4, 301-350.
+                </div>
+
+                <div class="reference-item">
+                    <strong>W3C.</strong> (2018). <em>Web Content Accessibility Guidelines (WCAG) 2.1</em>. 
+                    World Wide Web Consortium. 
+                    <a href="https://www.w3.org/TR/WCAG21/" target="_blank">https://www.w3.org/TR/WCAG21/</a>
+                </div>
+
+                <div class="reference-item">
+                    <strong>Korakakis, G.</strong> (2025). Scaffolding Prompt Literacy in Design Education: 
+                    A Structured Interface for AI-Generated UI/UX Components. <em>Cumulus Conference Proceedings</em>, 
+                    Athens 2026.
+                </div>
+
+                <div class="reference-item">
+                    <strong>Interaction Design Foundation.</strong> (n.d.). Gestalt Principles. Retrieved from 
+                    <a href="https://www.interaction-design.org/literature/topics/gestalt-principles" target="_blank">
+                    https://www.interaction-design.org/literature/topics/gestalt-principles</a>
+                </div>
+
+                <div class="reference-item">
+                    <strong>Nielsen Norman Group.</strong> (n.d.). 10 Usability Heuristics for User Interface Design. 
+                    Retrieved from 
+                    <a href="https://www.nngroup.com/articles/ten-usability-heuristics/" target="_blank">
+                    https://www.nngroup.com/articles/ten-usability-heuristics/</a>
+                </div>
+            </div>
+
+            <div class="nav-buttons">
+                <button class="nav-btn" onclick="previousSection()">
+                    <i class="fas fa-arrow-left"></i>
+                    <span>Previous</span>
+                </button>
+                <button class="nav-btn" onclick="nextSection()">
+                    <span>Next</span>
+                    <i class="fas fa-arrow-right"></i>
+                </button>
+            </div>
+        </section>
+
+        <section id="about">
+            <h2><i class="fas fa-info-circle"></i> About the Project</h2>
+
+            <div class="footer">
+                <p>
+                    <strong>Department of Graphic Design and Visual Communication</strong><br>
+                    School of Applied Arts and Culture<br>
+                    University of West Attica (UNIWA)<br><br>
+                    <strong>Research Team:</strong><br>
+                    Georgios Korakakis<br>
+                    Ourania Efstathiadou<br>
+                    Antigone Karamani<br>
+                    Konstadina Dalacosta<br><br>
+                    <strong>Development:</strong> With the assistance of Gemini & Claude AI<br>
+                                    </p>
+            </div>
+
+            <div class="nav-buttons">
+                <button class="nav-btn" onclick="previousSection()">
+                    <i class="fas fa-arrow-left"></i>
+                    <span>Previous</span>
+                </button>
+                <button class="nav-btn" onclick="showSection('intro')">
+                    <i class="fas fa-home"></i>
+                    <span>Home</span>
+                </button>
+            </div>
+        </section>
+
+    </main>
+
+    <div class="scroll-top" id="scrollTop" onclick="scrollToTop()">
+        <i class="fas fa-arrow-up"></i>
+    </div>
+
+    <script>
+        // State Management
+        let currentSection = 0;
+        const sections = ['intro', 'features', 'theory', 'workflow', 'accessibility', 'technical', 'references', 'about'];
+
+        // Section Navigation
+        function showSection(sectionId) {
+            sections.forEach(id => {
+                document.getElementById(id).classList.remove('active');
+            });
+            document.getElementById(sectionId).classList.add('active');
+            
+            document.querySelectorAll('.nav-link').forEach(link => {
+                link.classList.remove('active');
+                if (link.getAttribute('data-section') === sectionId) {
+                    link.classList.add('active');
+                }
+            });
+            
+            currentSection = sections.indexOf(sectionId);
+            window.scrollTo(0, 0);
+            
+            // Close mobile menu
+            if (window.innerWidth <= 1024) {
+                document.querySelector('.sidebar').classList.remove('active');
+            }
+        }
+
+        function nextSection() {
+            if (currentSection < sections.length - 1) {
+                showSection(sections[currentSection + 1]);
+            }
+        }
+
+        function previousSection() {
+            if (currentSection > 0) {
+                showSection(sections[currentSection - 1]);
+            }
+        }
+
+        // Theory Card Toggle
+        function toggleTheory(card) {
+            card.classList.toggle('expanded');
+        }
+
+        // Expand All Theory Cards
+        function expandAll() {
+            document.querySelectorAll('.theory-card').forEach(card => {
+                card.classList.add('expanded');
+            });
+        }
+
+        // Search Functionality
+        function searchContent() {
+            const query = document.getElementById('searchInput').value.toLowerCase();
+            if (query.length < 3) return;
+
+            // Remove previous highlights
+            document.querySelectorAll('.highlight').forEach(el => {
+                el.outerHTML = el.innerHTML;
+            });
+
+            if (query === '') return;
+
+            // Search in all sections
+            sections.forEach(sectionId => {
+                const section = document.getElementById(sectionId);
+                const content = section.innerText.toLowerCase();
+                
+                if (content.includes(query)) {
+                    // Show first matching section
+                    if (!section.classList.contains('active')) {
+                        showSection(sectionId);
+                        return;
+                    }
+                }
+            });
+        }
+
+        // Scroll to Top
+        function scrollToTop() {
+            window.scrollTo({ top: 0, behavior: 'smooth' });
+        }
+
+        // Show/Hide Scroll to Top Button
+        window.addEventListener('scroll', () => {
+            const scrollTop = document.getElementById('scrollTop');
+            if (window.scrollY > 300) {
+                scrollTop.classList.add('visible');
+            } else {
+                scrollTop.classList.remove('visible');
+            }
+        });
+
+        // Navigation Link Clicks
+        document.querySelectorAll('.nav-link').forEach(link => {
+            link.addEventListener('click', (e) => {
+                e.preventDefault();
+                const sectionId = link.getAttribute('data-section');
+                showSection(sectionId);
+            });
+        });
+
+        // Auto-expand theory cards when printing
+        window.addEventListener('beforeprint', () => {
+            document.querySelectorAll('.theory-card').forEach(card => {
+                card.classList.add('expanded');
+            });
+        });
+    </script>
+</body>
+</html>
